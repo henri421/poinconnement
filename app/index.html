@@ -150,6 +150,20 @@
         <p data-role="erreur" class="erreur" role="alert" hidden></p>
         <div data-role="resultat-corps"></div>
       </section>
+
+      <section id="sorties" aria-label="sorties">
+        <h2>Sorties</h2>
+        <div class="boutons">
+          <button type="button" data-action="exporter-dessins">Dessins (SVG)</button>
+          <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+          <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
+        </div>
+        <p class="note">
+          La note s'ouvre dans un onglet et s'imprime en PDF par le navigateur. Si l'ouverture
+          est bloquee, elle est telechargee. C'est un compte rendu, pas une justification
+          reglementaire signee.
+        </p>
+      </section>
     </main>
 
     <footer>

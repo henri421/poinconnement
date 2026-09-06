@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>poinconnement — verification des dalles, EN 1992-1-1:2004 §6.4</title>
-    <script type="module" crossorigin src="./assets/index-CjaVnt_p.js"></script>
+    <script type="module" crossorigin src="./assets/index-8p4R1Wbn.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-uUQPngmD.css">
   </head>
   <body>
@@ -151,6 +151,20 @@
         <h2>Resultat</h2>
         <p data-role="erreur" class="erreur" role="alert" hidden></p>
         <div data-role="resultat-corps"></div>
+      </section>
+
+      <section id="sorties" aria-label="sorties">
+        <h2>Sorties</h2>
+        <div class="boutons">
+          <button type="button" data-action="exporter-dessins">Dessins (SVG)</button>
+          <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+          <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
+        </div>
+        <p class="note">
+          La note s'ouvre dans un onglet et s'imprime en PDF par le navigateur. Si l'ouverture
+          est bloquee, elle est telechargee. C'est un compte rendu, pas une justification
+          reglementaire signee.
+        </p>
       </section>
     </main>
 

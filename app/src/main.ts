@@ -17,7 +17,18 @@ import {
   modeleParDefaut,
   type ModeleSaisie,
 } from './form';
-import { messageDErreur, rendreResultat, schemaDuPoteau } from './view';
+import {
+  avertissementPerimetre,
+  lignesDuResultat,
+  messageDErreur,
+  noteSurU0,
+  rendreResultat,
+  schemaDuPoteau,
+  titreDuVerdict,
+} from './view';
+import { JETONS, noteDeCalculHtml, resultatsEnCsv, svgAutonome } from './export';
+import type { BlocExport } from './export';
+import { telecharger } from './storage';
 import './style.css';
 
 /** Element attendu de la page ; son absence est une erreur de developpement. */
@@ -127,11 +138,184 @@ function rafraichir(): void {
 
     corpsSchema.innerHTML = schema;
     corpsResultat.innerHTML = rendreResultat(resultat, donnees.poteau);
+    // Ce que les sorties exporteront : le DERNIER etat valide, jamais une
+    // saisie intermediaire fautive.
+    derniereSortie = { modele, donnees, resultat, schema, positions: corpsPositions.innerHTML };
     effacerErreur();
   } catch (erreur) {
     afficherErreur(messageDErreur(erreur));
   }
 }
+
+// --- Sorties -----------------------------------------------------------------
+
+interface EtatExportable {
+  modele: ReturnType<typeof modeleParDefaut>;
+  donnees: ReturnType<typeof donneesDepuisModele>;
+  resultat: ReturnType<typeof verifierPoinconnement>;
+  schema: string;
+  positions: string;
+}
+
+let derniereSortie: EtatExportable | null = null;
+
+/** Nom de fichier, tire de la position et de la date. */
+function baseDeNom(sortie: EtatExportable): string {
+  return `poinconnement-${sortie.modele.position}`;
+}
+
+function dateDuJour(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Les donnees d'entree, dans la meme forme que les resultats. */
+function blocsDEntree(sortie: EtatExportable): BlocExport[] {
+  const m = sortie.modele;
+  const geometrie =
+    m.forme === 'circulaire'
+      ? [{ symbole: 'D', libelle: 'diametre du poteau', valeur: `${m.D} mm` }]
+      : [
+          { symbole: 'c1', libelle: 'cote perpendiculaire au bord libre', valeur: `${m.c1} mm` },
+          { symbole: 'c2', libelle: 'cote parallele au bord libre', valeur: `${m.c2} mm` },
+        ];
+
+  return [
+    {
+      titre: 'Dalle',
+      lignes: [
+        { symbole: 'd_y', libelle: 'hauteur utile, direction y', valeur: `${m.d_y} mm` },
+        { symbole: 'd_z', libelle: 'hauteur utile, direction z', valeur: `${m.d_z} mm` },
+        { symbole: 'f_ck', libelle: 'resistance caracteristique du beton', valeur: `${m.f_ck} MPa` },
+        { symbole: 'rho_ly', libelle: 'taux d armature longitudinale, direction y', valeur: `${m.rho_ly}` },
+        { symbole: 'rho_lz', libelle: 'taux d armature longitudinale, direction z', valeur: `${m.rho_lz}` },
+      ],
+      note: null,
+    },
+    {
+      titre: 'Poteau',
+      lignes: [
+        { symbole: 'forme', libelle: 'forme du poteau', valeur: m.forme },
+        ...geometrie,
+        { symbole: 'position', libelle: 'position dans la dalle', valeur: m.position },
+      ],
+      note: null,
+    },
+    {
+      titre: 'Sollicitation',
+      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinconnement', valeur: `${m.V_Ed} kN` }],
+      note: null,
+    },
+  ];
+}
+
+/** Les resultats, verdict compris. */
+function blocsDeResultat(sortie: EtatExportable): BlocExport[] {
+  return [
+    {
+      titre: 'Verification (§6.4)',
+      lignes: lignesDuResultat(sortie.resultat),
+      note: noteSurU0(sortie.donnees.poteau, sortie.resultat),
+    },
+    {
+      titre: 'Verdict',
+      lignes: [
+        {
+          symbole: 'verdict',
+          libelle: titreDuVerdict(sortie.resultat.verdict),
+          valeur: sortie.resultat.verdict,
+        },
+      ],
+      note: sortie.resultat.motif,
+    },
+  ];
+}
+
+const HYPOTHESES = [
+  'Dalle pleine d epaisseur constante : ni chapiteau, ni dalle allegee, ni precontrainte.',
+  'Coefficient beta par valeurs simplifiees du §6.4.3(6) ou impose ; pas de calcul par W1.',
+  'Aucune ouverture a proximite du poteau (§6.4.2(3)).',
+  'Dispositions constructives des armatures de poinconnement (§9.4.3) non verifiees.',
+  'Valeurs recommandees de l EN 1992-1-1 ; une annexe nationale peut les modifier.',
+];
+
+/** Les mises en garde a placer en evidence dans la note. */
+function avertissementsDeLaNote(sortie: EtatExportable): string[] {
+  const a = avertissementPerimetre(sortie.modele.position);
+  return a === null ? [] : [a];
+}
+
+function sansCalculAExporter(): void {
+  afficherErreur(
+    'Aucun calcul valide a exporter. Les sorties decrivent le dernier calcul reussi : ' +
+      'corriger la saisie, puis reessayer.'
+  );
+}
+
+function exporterDessins(sortie: EtatExportable): void {
+  const base = baseDeNom(sortie);
+  telecharger(`${base}-positions.svg`, svgAutonome(sortie.positions, JETONS), 'image/svg+xml;charset=utf-8');
+  telecharger(`${base}-perimetres.svg`, svgAutonome(sortie.schema, JETONS), 'image/svg+xml;charset=utf-8');
+}
+
+function exporterResultats(sortie: EtatExportable): void {
+  telecharger(
+    `${baseDeNom(sortie)}-resultats.csv`,
+    resultatsEnCsv([...blocsDEntree(sortie), ...blocsDeResultat(sortie)]),
+    'text/csv;charset=utf-8'
+  );
+}
+
+function exporterNote(sortie: EtatExportable): void {
+  const html = noteDeCalculHtml(
+    {
+      titre: `Poteau ${sortie.modele.position}`,
+      date: dateDuJour(),
+      entrees: blocsDEntree(sortie),
+      // Les dessins DEJA produits, jamais redessines.
+      dessins: [sortie.positions, sortie.schema],
+      resultats: blocsDeResultat(sortie),
+      avertissements: avertissementsDeLaNote(sortie),
+      hypotheses: HYPOTHESES,
+    },
+    JETONS
+  );
+  const nom = `${baseDeNom(sortie)}-note.html`;
+
+  // L'ouverture d'onglet est bloquee par defaut chez beaucoup d'utilisateurs.
+  // Un bouton qui ne fait rien SANS RIEN DIRE est pire qu'un telechargement
+  // inattendu : on retombe alors sur le fichier.
+  let onglet: Window | null = null;
+  try {
+    onglet = window.open('', '_blank') ?? null;
+  } catch {
+    onglet = null;
+  }
+  if (onglet === null) {
+    telecharger(nom, html, 'text/html;charset=utf-8');
+    return;
+  }
+  try {
+    onglet.document.write(html);
+    onglet.document.close();
+  } catch {
+    telecharger(nom, html, 'text/html;charset=utf-8');
+  }
+}
+
+document.addEventListener('click', (evenement) => {
+  const cible = evenement.target;
+  if (!(cible instanceof HTMLElement)) return;
+  const action = cible.dataset.action;
+  if (action === undefined || !action.startsWith('exporter-')) return;
+
+  if (derniereSortie === null) {
+    sansCalculAExporter();
+    return;
+  }
+  if (action === 'exporter-dessins') exporterDessins(derniereSortie);
+  else if (action === 'exporter-resultats') exporterResultats(derniereSortie);
+  else if (action === 'exporter-note') exporterNote(derniereSortie);
+});
 
 ecrireModele(modeleParDefaut());
 formulaire.addEventListener('input', rafraichir);
