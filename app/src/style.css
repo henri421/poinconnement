@@ -249,14 +249,23 @@ input[type='text']:focus {
   stroke: none;
 }
 
+/*
+ * Le bord libre se dessine en ENCRE, pas en couleur de verdict.
+ *
+ * Il etait trace en `--refus`, c'est-a-dire dans la couleur qui dit « la
+ * verification echoue » quelques centimetres plus bas sur le meme ecran. Un
+ * bord libre est une condition aux limites, pas un verdict : meme arbitrage
+ * que pour les appuis de STM, et application de la regle « une couleur de
+ * sens ne sert jamais de decor ».
+ */
 .schema-positions .bord-libre {
   fill: none;
-  stroke: var(--refus);
+  stroke: var(--texte);
   stroke-width: 3;
 }
 
 .schema-positions .bord-libre-nom {
-  fill: var(--refus);
+  fill: var(--texte);
   font-size: 12px;
 }
 
@@ -337,7 +346,7 @@ input[type='text']:focus {
 }
 
 .schema-poteau .bord-libre {
-  stroke: var(--refus);
+  stroke: var(--texte);
   stroke-width: 3;
 }
 
