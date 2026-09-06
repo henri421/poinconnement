@@ -6,6 +6,19 @@
     <title>poinconnement — verification des dalles, EN 1992-1-1:2004 §6.4</title>
   </head>
   <body>
+    <nav class="barre" aria-label="suite d'outils">
+      <div class="barre-corps">
+        <span class="barre-nom">EC2 &middot; Beton arme</span>
+        <a
+          class="barre-lien"
+          href="https://henri421.github.io/WebAedificium/"
+          target="_blank"
+          rel="noopener"
+          >Outils EC2 &#8599;</a
+        >
+      </div>
+    </nav>
+
     <header>
       <h1>poinconnement</h1>
       <p class="sous-titre">
@@ -23,32 +36,32 @@
         <form id="formulaire" autocomplete="off">
           <fieldset>
             <legend>Dalle</legend>
-            <label>d<sub>y</sub> (mm)
+            <label><span>d<sub>y</sub> (mm)</span>
               <input type="text" inputmode="decimal" data-champ="d_y" />
             </label>
-            <label>d<sub>z</sub> (mm)
+            <label><span>d<sub>z</sub> (mm)</span>
               <input type="text" inputmode="decimal" data-champ="d_z" />
             </label>
-            <label>f<sub>ck</sub> (MPa)
+            <label><span>f<sub>ck</sub> (MPa)</span>
               <input type="text" inputmode="decimal" data-champ="f_ck" />
             </label>
-            <label>&rho;<sub>ly</sub> (-)
+            <label><span>&rho;<sub>ly</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_ly" />
             </label>
-            <label>&rho;<sub>lz</sub> (-)
+            <label><span>&rho;<sub>lz</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_lz" />
             </label>
           </fieldset>
 
           <fieldset>
             <legend>Poteau</legend>
-            <label>Forme
+            <label><span>Forme</span>
               <select data-champ="forme">
                 <option value="rectangulaire">rectangulaire</option>
                 <option value="circulaire">circulaire</option>
               </select>
             </label>
-            <label>Position
+            <label><span>Position</span>
               <select data-champ="position">
                 <option value="interieur">interieur (&beta; = 1,15)</option>
                 <option value="rive">rive (&beta; = 1,4)</option>
@@ -56,15 +69,15 @@
               </select>
             </label>
             <div class="groupe" data-groupe="rectangulaire">
-              <label>c<sub>1</sub> (mm), perpendiculaire au bord libre
+              <label><span>c<sub>1</sub> (mm), perpendiculaire au bord libre</span>
                 <input type="text" inputmode="decimal" data-champ="c1" />
               </label>
-              <label>c<sub>2</sub> (mm), parallele au bord libre
+              <label><span>c<sub>2</sub> (mm), parallele au bord libre</span>
                 <input type="text" inputmode="decimal" data-champ="c2" />
               </label>
             </div>
             <div class="groupe" data-groupe="circulaire">
-              <label>D (mm)
+              <label><span>D (mm)</span>
                 <input type="text" inputmode="decimal" data-champ="D" />
               </label>
             </div>
@@ -72,15 +85,15 @@
 
           <fieldset>
             <legend>Effort</legend>
-            <label>V<sub>Ed</sub> (kN)
+            <label><span>V<sub>Ed</sub> (kN)</span>
               <input type="text" inputmode="decimal" data-champ="V_Ed" />
             </label>
             <label class="case">
               <input type="checkbox" data-champ="beta_impose" />
-              imposer &beta; plutot que la valeur simplifiee du §6.4.3(6)
+              <span>imposer &beta; plutot que la valeur simplifiee du §6.4.3(6)</span>
             </label>
             <div class="groupe" data-groupe="beta">
-              <label>&beta; (-)
+              <label><span>&beta; (-)</span>
                 <input type="text" inputmode="decimal" data-champ="beta" />
               </label>
             </div>
@@ -90,16 +103,16 @@
             <legend>Armatures de poinconnement envisagees</legend>
             <label class="case">
               <input type="checkbox" data-champ="armatures" />
-              deduire l'aire par cours qui satisfait l'eq. (6.52)
+              <span>deduire l'aire par cours qui satisfait l'eq. (6.52)</span>
             </label>
             <div class="groupe" data-groupe="armatures">
-              <label>s<sub>r</sub> (mm), espacement radial
+              <label><span>s<sub>r</sub> (mm), espacement radial</span>
                 <input type="text" inputmode="decimal" data-champ="s_r" />
               </label>
-              <label>f<sub>ywd</sub> (MPa)
+              <label><span>f<sub>ywd</sub> (MPa)</span>
                 <input type="text" inputmode="decimal" data-champ="f_ywd" />
               </label>
-              <label>&alpha; (degres) avec le plan de la dalle
+              <label><span>&alpha; (degres) avec le plan de la dalle</span>
                 <input type="text" inputmode="decimal" data-champ="alpha" />
               </label>
             </div>
@@ -107,10 +120,10 @@
 
           <fieldset>
             <legend>Coefficients</legend>
-            <label>&gamma;<sub>c</sub> (-)
+            <label><span>&gamma;<sub>c</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="gamma_c" />
             </label>
-            <label>&alpha;<sub>cc</sub> (-)
+            <label><span>&alpha;<sub>cc</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="alpha_cc" />
             </label>
           </fieldset>
