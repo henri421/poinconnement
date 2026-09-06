@@ -20,6 +20,7 @@
  */
 
 import { coefficientBetaSimplifie, type PositionPoteau } from '../../src/index';
+import { echapper } from './view';
 
 /** Repere du dessin, en unites de viewBox. */
 const LARGEUR = 640;
@@ -119,15 +120,6 @@ function virgule(valeur: number): string {
   return String(valeur).replace('.', ',');
 }
 
-/** Echappement du texte insere dans le SVG. */
-function texte(valeur: string): string {
-  return valeur
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 /** Un cas : son perimetre en pointilles, son poteau, son nom et son beta. */
 function groupeDuCas(cas: Cas, courante: PositionPoteau): string {
   const estCourante = cas.position === courante;
@@ -140,9 +132,9 @@ function groupeDuCas(cas: Cas, courante: PositionPoteau): string {
     `<rect data-role="poteau" class="poteau" x="${cas.poteau.x}" y="${cas.poteau.y}"`,
     ` width="${COTE}" height="${COTE}" />`,
     `<text data-role="nom" class="nom" x="${cas.etiquette.x}" y="${cas.etiquette.y}">`,
-    `${texte(cas.nom)}</text>`,
+    `${echapper(cas.nom)}</text>`,
     `<text data-role="beta" class="beta" x="${cas.etiquette.x}" y="${cas.etiquette.y + 22}">`,
-    `${texte(`β = ${beta}`)}</text>`,
+    `${echapper(`β = ${beta}`)}</text>`,
     '</g>',
   ].join('');
 }
@@ -172,7 +164,7 @@ export function schemaDesPositions(courante: PositionPoteau): string {
   const conditions = CONDITIONS.map(
     (ligne, index) =>
       `<text class="conditions" x="${BORD_GAUCHE}" y="${BORD_BAS + 34 + index * 17}">` +
-      `${texte(ligne)}</text>`,
+      `${echapper(ligne)}</text>`,
   ).join('');
 
   return [
