@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>poinconnement — verification des dalles, EN 1992-1-1:2004 §6.4</title>
+    <script type="module" crossorigin src="./assets/index-Cn18Pmcu.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DBZFyhgd.css">
+  </head>
+  <body>
+    <header>
+      <h1>poinconnement</h1>
+      <p class="sous-titre">
+        Verification du poinconnement d'une dalle pleine au droit d'un poteau —
+        EN 1992-1-1:2004, §6.4.
+      </p>
+      <p class="avertissement">
+        Outil d'aide au calcul : il constate, il ne prescrit pas. La verification
+        finale et la responsabilite incombent a l'ingenieur du projet.
+      </p>
+    </header>
+
+    <main>
+      <section id="saisie" aria-label="saisie de la dalle et du poteau">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Dalle</legend>
+            <label>d<sub>y</sub> (mm)
+              <input type="text" inputmode="decimal" data-champ="d_y" />
+            </label>
+            <label>d<sub>z</sub> (mm)
+              <input type="text" inputmode="decimal" data-champ="d_z" />
+            </label>
+            <label>f<sub>ck</sub> (MPa)
+              <input type="text" inputmode="decimal" data-champ="f_ck" />
+            </label>
+            <label>&rho;<sub>ly</sub> (-)
+              <input type="text" inputmode="decimal" data-champ="rho_ly" />
+            </label>
+            <label>&rho;<sub>lz</sub> (-)
+              <input type="text" inputmode="decimal" data-champ="rho_lz" />
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Poteau</legend>
+            <label>Forme
+              <select data-champ="forme">
+                <option value="rectangulaire">rectangulaire</option>
+                <option value="circulaire">circulaire</option>
+              </select>
+            </label>
+            <label>Position
+              <select data-champ="position">
+                <option value="interieur">interieur (&beta; = 1,15)</option>
+                <option value="rive">rive (&beta; = 1,4)</option>
+                <option value="angle">angle (&beta; = 1,5)</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="rectangulaire">
+              <label>c<sub>1</sub> (mm), perpendiculaire au bord libre
+                <input type="text" inputmode="decimal" data-champ="c1" />
+              </label>
+              <label>c<sub>2</sub> (mm), parallele au bord libre
+                <input type="text" inputmode="decimal" data-champ="c2" />
+              </label>
+            </div>
+            <div class="groupe" data-groupe="circulaire">
+              <label>D (mm)
+                <input type="text" inputmode="decimal" data-champ="D" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Effort</legend>
+            <label>V<sub>Ed</sub> (kN)
+              <input type="text" inputmode="decimal" data-champ="V_Ed" />
+            </label>
+            <label class="case">
+              <input type="checkbox" data-champ="beta_impose" />
+              imposer &beta; plutot que la valeur simplifiee du §6.4.3(6)
+            </label>
+            <div class="groupe" data-groupe="beta">
+              <label>&beta; (-)
+                <input type="text" inputmode="decimal" data-champ="beta" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Armatures de poinconnement envisagees</legend>
+            <label class="case">
+              <input type="checkbox" data-champ="armatures" />
+              deduire l'aire par cours qui satisfait l'eq. (6.52)
+            </label>
+            <div class="groupe" data-groupe="armatures">
+              <label>s<sub>r</sub> (mm), espacement radial
+                <input type="text" inputmode="decimal" data-champ="s_r" />
+              </label>
+              <label>f<sub>ywd</sub> (MPa)
+                <input type="text" inputmode="decimal" data-champ="f_ywd" />
+              </label>
+              <label>&alpha; (degres) avec le plan de la dalle
+                <input type="text" inputmode="decimal" data-champ="alpha" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Coefficients</legend>
+            <label>&gamma;<sub>c</sub> (-)
+              <input type="text" inputmode="decimal" data-champ="gamma_c" />
+            </label>
+            <label>&alpha;<sub>cc</sub> (-)
+              <input type="text" inputmode="decimal" data-champ="alpha_cc" />
+            </label>
+          </fieldset>
+        </form>
+      </section>
+
+      <section id="positions" aria-label="les trois positions de poteau et leur coefficient beta">
+        <h2>Position du poteau et coefficient &beta;</h2>
+        <div data-role="positions-corps"></div>
+      </section>
+
+      <section id="schema" aria-label="trace en plan du poteau et de ses perimetres">
+        <h2>Trace en plan</h2>
+        <div data-role="schema-corps"></div>
+        <p class="legende">
+          Trait plein : le poteau. Trait fort : le perimetre au nu u<sub>0</sub>.
+          Pointilles : le perimetre de controle u<sub>1</sub>, a 2d, ecrete aux
+          bords libres (trait rouge).
+        </p>
+      </section>
+
+      <section id="resultat" aria-label="resultat de la verification">
+        <h2>Resultat</h2>
+        <p data-role="erreur" class="erreur" role="alert" hidden></p>
+        <div data-role="resultat-corps"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Limites : dalles pleines d'epaisseur constante, sans chapiteau ni
+        precontrainte ; pas d'ouverture pres du poteau (§6.4.2(3)) ; dispositions
+        constructives des armatures non verifiees (§9.4.3) ; &beta; simplifie ou
+        impose, sans calcul par W<sub>1</sub>.
+      </p>
+    </footer>
+
+  </body>
+</html>

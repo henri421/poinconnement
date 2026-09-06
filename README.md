@@ -8,6 +8,26 @@ l'**EN 1992-1-1:2004** (Eurocode 2, 1ʳᵉ génération), §6.4.
 > de la norme — jamais un plan de ferraillage. Les résultats relèvent de la
 > responsabilité de l'ingénieur qui les emploie, et doivent être vérifiés.
 
+## L'interface
+
+Une page web accompagne le noyau : elle est construite dans `docs/`, servie par
+GitHub Pages, et reliée depuis le hub
+[WebAedificium](https://henri421.github.io/WebAedificium/).
+
+On y saisit la dalle (`d_y`, `d_z`, `f_ck`, `ρ_ly`, `ρ_lz`), le poteau (forme,
+`c₁`/`c₂` ou `D`, position), l'effort (`V_Ed`, `β` imposé au besoin), les
+armatures envisagées (`s_r`, `f_ywd`, `α`) et les coefficients (`γ_c`, `α_cc`).
+Elle rend :
+
+- **un schéma des trois positions de poteau** — intérieur, rive, angle — avec
+  leur périmètre de contrôle et leur coefficient `β` (1,15 · 1,4 · 1,5), et,
+  écrites sous le schéma, les conditions du §6.4.3(6) qui rendent ces trois
+  valeurs licites. Prendre 1,15 hors de ces conditions, c'est se tromper en
+  silence ;
+- **un tracé en plan à l'échelle** du poteau, de son périmètre au nu `u₀` et de
+  son périmètre de contrôle `u₁`, écrêtés aux bords libres ;
+- **le verdict et son motif**, plus toutes les grandeurs du calcul.
+
 ## Ce que fait l'outil
 
 À partir d'une géométrie de poteau, d'une épaisseur utile, d'un béton, de taux
@@ -73,10 +93,15 @@ Deux points qui se confondent facilement, et que les tests fixent :
   cours. L'aire rendue satisfait l'éq. (6.52), rien de plus.
 - Le poteau est supposé **affleurant** le ou les bords libres. Un poteau en
   retrait offrirait un périmètre plus long : l'hypothèse est conservative.
-- **La réduction du périmètre de la Figure 6.15 n'est pas implémentée.** Pour
-  certaines géométries de rive ou d'angle, l'EC2 permet de retenir un périmètre
-  plus court que celui de l'offset à 2d ; ne pas l'appliquer peut ici
-  surestimer `u₁`. À vérifier à la main sur les poteaux de rive très allongés.
+- ⚠ **Poteaux de rive et d'angle : la réduction du périmètre de la Figure 6.15
+  n'est pas implémentée, et l'écart va dans le sens défavorable.** Le périmètre
+  de contrôle est ici l'offset à 2d écrêté au bord libre. Pour ces deux
+  positions, l'EC2 impose de retenir le périmètre **plus court** de sa figure
+  lorsque celui-ci l'est. Ne pas l'appliquer **surestime `u₁`**, donc
+  **sous-estime `v_Ed = β·V_Ed/(u₁·d)`** : le résultat est alors **non
+  conservatif**. L'interface affiche cet avertissement à côté du résultat dès
+  que la position est `rive` ou `angle` ; il faut vérifier `u₁` à la main, en
+  particulier sur un poteau allongé.
 - **`u₀` d'un poteau circulaire de rive ou d'angle** : le §6.4.5(3) n'en donne
   pas l'expression. L'outil refuse le cas plutôt que d'inventer une formule ou
   de rendre le contour géométrique, qui serait non conservatif.
@@ -86,6 +111,13 @@ Deux points qui se confondent facilement, et que les tests fixent :
 ## Développement
 
 ```bash
-npx vitest run     # tests
-npx tsc --noEmit   # typage
+npm test           # tests
+npm run typecheck  # typage
+npm run dev        # interface en local
+npm run build      # construction dans docs/, servie par GitHub Pages
 ```
+
+Le noyau de calcul (`src/`) est pur et n'importe rien de l'interface. Celle-ci
+(`app/`) ne calcule rien : la lecture de la saisie (`form.ts`), la mise en forme
+(`view.ts`) et le schéma des positions (`beta-diagram.ts`) sont des modules purs
+testés, et `main.ts` ne fait que les brancher au document.
