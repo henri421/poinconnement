@@ -26,7 +26,7 @@ import {
   schemaDuPoteau,
   titreDuVerdict,
 } from './view';
-import { JETONS, noteDeCalculHtml, resultatsEnCsv, svgAutonome } from './export';
+import { STYLES_TRACE, noteDeCalculHtml, resultatsEnCsv, svgAutonome } from './export';
 import type { BlocExport } from './export';
 import { telecharger } from './storage';
 import './style.css';
@@ -253,8 +253,8 @@ function sansCalculAExporter(): void {
 
 function exporterDessins(sortie: EtatExportable): void {
   const base = baseDeNom(sortie);
-  telecharger(`${base}-positions.svg`, svgAutonome(sortie.positions, JETONS), 'image/svg+xml;charset=utf-8');
-  telecharger(`${base}-perimetres.svg`, svgAutonome(sortie.schema, JETONS), 'image/svg+xml;charset=utf-8');
+  telecharger(`${base}-positions.svg`, svgAutonome(sortie.positions, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
+  telecharger(`${base}-perimetres.svg`, svgAutonome(sortie.schema, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
 }
 
 function exporterResultats(sortie: EtatExportable): void {
@@ -277,7 +277,10 @@ function exporterNote(sortie: EtatExportable): void {
       avertissements: avertissementsDeLaNote(sortie),
       hypotheses: HYPOTHESES,
     },
-    JETONS
+    // STYLES_TRACE et non JETONS : la note porte les DEUX dessins en ligne,
+    // et les jetons seuls les laisseraient noirs, exactement comme les SVG
+    // exportes separement.
+    STYLES_TRACE
   );
   const nom = `${baseDeNom(sortie)}-note.html`;
 

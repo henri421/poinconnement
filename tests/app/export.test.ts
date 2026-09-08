@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   svgAutonome,
   resultatsEnCsv,
   noteDeCalculHtml,
   JETONS,
+  STYLES_TRACE,
 } from '../../app/src/export';
 import type { BlocExport } from '../../app/src/export';
 
@@ -21,6 +24,84 @@ const HORS_DOMAINE: BlocExport = {
   lignes: [],
   note: "non calculees : aucune armature n'est requise",
 };
+
+/**
+ * REGRESSION REELLE : les dessins exportes sortaient entierement NOIRS.
+ *
+ * La cause n'etait pas dans `svgAutonome`, qui faisait son travail, mais
+ * dans ce qu'on lui passait : `JETONS` ne porte que le bloc `:root`. Il
+ * DEFINIT les couleurs, il n'en APPLIQUE aucune — les regles qui peignent le
+ * trace vivent dans `style.css`, qu'un document exporte ne voit pas. Chaque
+ * forme retombait donc sur les defauts SVG, `fill: black` et `stroke: none`.
+ *
+ * Ces tests verrouillent la cause, pas le symptome : ils exigent que
+ * `STYLES_TRACE` porte une regle pour CHAQUE classe que les traces emettent,
+ * en la relisant dans `style.css`. Une classe ajoutee au dessin sans regle
+ * correspondante fait echouer la suite avant que le dessin ne redevienne
+ * noir chez l'utilisateur.
+ */
+describe('STYLES_TRACE : les regles qui peignent, pas seulement les jetons', () => {
+  /** Les classes que les deux traces posent sur leurs elements. */
+  const CLASSES_DESSINEES = [
+    'dalle-fond',
+    'bord-libre',
+    'bord-libre-nom',
+    'poteau',
+    'perimetre',
+    'nom',
+    'beta',
+    'position-retrait',
+    'position-courante',
+    'conditions',
+    'dalle',
+    'perimetre-u0',
+    'perimetre-u1',
+  ];
+
+  it('porte une regle pour chaque classe des traces', () => {
+    for (const classe of CLASSES_DESSINEES) {
+      expect(STYLES_TRACE, `classe « ${classe} » sans regle exportee`).toContain(`.${classe}`);
+    }
+  });
+
+  it('les jetons y sont, mais ils ne suffisaient pas', () => {
+    expect(STYLES_TRACE).toContain('--texte: #1a1a1a');
+    expect(STYLES_TRACE).toContain('--accent: #1e5aa8');
+    // Ce que JETONS seul n'avait pas : une declaration de peinture.
+    expect(JETONS).not.toContain('fill:');
+    expect(STYLES_TRACE).toContain('fill:');
+    expect(STYLES_TRACE).toContain('stroke:');
+  });
+
+  /**
+   * Les selecteurs sont des DESCENDANTS de `.schema-positions` et
+   * `.schema-poteau`. Ils ne valent que si ces classes restent sur la balise
+   * `<svg>` racine — les deplacer sur un conteneur HTML de la page casserait
+   * le rendu exporte sans rien casser a l'ecran.
+   */
+  it('les traces portent bien leur classe sur la balise svg racine', () => {
+    const lire = (chemin: string) =>
+      readFileSync(fileURLToPath(new URL(chemin, import.meta.url)), 'utf8');
+
+    expect(lire('../../app/src/beta-diagram.ts')).toContain('<svg viewBox');
+    expect(lire('../../app/src/beta-diagram.ts')).toMatch(/<svg viewBox[^`]*class="schema-positions"/);
+    expect(lire('../../app/src/view.ts')).toMatch(/class="schema-poteau"/);
+  });
+
+  /**
+   * Le trace en plan est a l'echelle du modele, en millimetres. Sans
+   * `vector-effect`, les epaisseurs de trait sont multipliees par le facteur
+   * d'echelle et le dessin sort en aplats.
+   */
+  it('conserve l epaisseur de trait du trace a l echelle du modele', () => {
+    expect(STYLES_TRACE).toContain('vector-effect: non-scaling-stroke');
+  });
+
+  /** Hors de la page, il n'y a plus de corps dont heriter la police. */
+  it('impose la police, que le dessin heritait de la page', () => {
+    expect(STYLES_TRACE).toContain('font-family: var(--sans)');
+  });
+});
 
 describe('svgAutonome', () => {
   const svg = '<svg viewBox="0 0 100 50"><rect class="beton" width="10" height="10"/></svg>';
