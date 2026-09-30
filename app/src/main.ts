@@ -28,7 +28,7 @@ import {
 } from './view';
 import { STYLES_TRACE, noteDeCalculHtml, resultatsEnCsv, svgAutonome } from './export';
 import type { BlocExport } from './export';
-import { telecharger } from './storage';
+import { ouvrirOuTelecharger, telecharger } from './storage';
 import './style.css';
 
 /** Element attendu de la page ; son absence est une erreur de developpement. */
@@ -284,25 +284,8 @@ function exporterNote(sortie: EtatExportable): void {
   );
   const nom = `${baseDeNom(sortie)}-note.html`;
 
-  // L'ouverture d'onglet est bloquee par defaut chez beaucoup d'utilisateurs.
-  // Un bouton qui ne fait rien SANS RIEN DIRE est pire qu'un telechargement
-  // inattendu : on retombe alors sur le fichier.
-  let onglet: Window | null = null;
-  try {
-    onglet = window.open('', '_blank') ?? null;
-  } catch {
-    onglet = null;
-  }
-  if (onglet === null) {
-    telecharger(nom, html, 'text/html;charset=utf-8');
-    return;
-  }
-  try {
-    onglet.document.write(html);
-    onglet.document.close();
-  } catch {
-    telecharger(nom, html, 'text/html;charset=utf-8');
-  }
+  // Onglet si possible, sinon telechargement : jamais un bouton muet.
+  ouvrirOuTelecharger(nom, html);
 }
 
 document.addEventListener('click', (evenement) => {

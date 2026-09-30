@@ -10,6 +10,7 @@
  * angle des armatures en DEGRES — plus naturel a saisir que des radians.
  */
 
+import { lireNombre } from 'aedificium-ui';
 import type { DonneesPoinconnement, PositionPoteau } from '../../src/index';
 
 export type FormePoteau = 'rectangulaire' | 'circulaire';
@@ -90,21 +91,8 @@ export function modeleParDefaut(): ModeleSaisie {
   };
 }
 
-/**
- * Nombre lu depuis un champ de saisie, ou `null`.
- *
- * La virgule decimale est acceptee : c'est ainsi qu'on ecrit une note de
- * calcul. L'infini est refuse — il traverserait sans bruit tous les tests de
- * finitude du noyau et ressortirait en resultat.
- */
-export function lireNombre(texte: string): number | null {
-  const nettoye = texte.trim().replace(',', '.');
-  if (nettoye === '') {
-    return null;
-  }
-  const valeur = Number(nettoye);
-  return Number.isFinite(valeur) ? valeur : null;
-}
+
+export { lireNombre };
 
 /** Champs du formulaire correspondant a un modele ; les cases valent oui/non. */
 export function champsDepuisModele(modele: ModeleSaisie): Record<string, string> {

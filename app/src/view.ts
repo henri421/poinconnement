@@ -15,6 +15,9 @@ import {
   type Verdict,
 } from '../../src/index';
 
+export { echapper, nombreFr } from 'aedificium-ui';
+import { echapper, nombreFr } from 'aedificium-ui';
+
 /** Une grandeur du calcul, telle qu'elle se lit dans le tableau. */
 export interface LigneResultat {
   symbole: string;
@@ -22,27 +25,7 @@ export interface LigneResultat {
   valeur: string;
 }
 
-/** Echappement de tout texte insere dans du HTML ou du SVG. */
-export function echapper(valeur: string): string {
-  return valeur
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
 
-/**
- * Nombre affiche a la francaise, virgule decimale comprise.
- *
- * Un NaN ou un infini ne doit JAMAIS atteindre l'ecran : il s'y lit comme une
- * valeur alors qu'il signale une absence de valeur. On rend un tiret.
- */
-export function nombreFr(valeur: number, decimales: number): string {
-  if (!Number.isFinite(valeur)) {
-    return '—';
-  }
-  return valeur.toFixed(decimales).replace('.', ',');
-}
 
 /**
  * Avertissement obligatoire sur les poteaux de rive et d'angle.

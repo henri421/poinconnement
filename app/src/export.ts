@@ -1,5 +1,22 @@
 import type { LigneResultat } from './view';
-import { echapper } from './view';
+import {
+  JETONS,
+  echapper,
+  resultatsEnCsv as resultatsEnCsvCommun,
+  svgAutonome as svgAutonomeCommun,
+} from 'aedificium-ui';
+
+export { JETONS };
+
+/** Enveloppe un SVG de la page dans un document autonome, styles INLINES. */
+export function svgAutonome(svg: string, styles: string): string {
+  return svgAutonomeCommun(svg, styles);
+}
+
+/** Les resultats affiches, en CSV (point-virgule, BOM, aucun bloc omis). */
+export function resultatsEnCsv(blocs: BlocExport[]): string {
+  return resultatsEnCsvCommun(blocs);
+}
 
 /**
  * Les sorties : ce qui fait quitter la page a ce qu'elle calcule.
@@ -21,38 +38,6 @@ export interface BlocExport {
   note: string | null;
 }
 
-/**
- * Les jetons de l'identite graphique, embarques dans les documents exportes.
- *
- * Copie du `:root` de `style.css`. Un document exporte est AUTONOME : il ne
- * voit pas la feuille de la page, et sans cette copie il s'ouvrirait sans
- * couleur — voire noir sur noir. Toute evolution du `:root` doit etre
- * reportee ici.
- */
-export const JETONS = `:root {
-  --fond: #f7f7f6;
-  --surface: #ffffff;
-  --surface-appui: #f2f1ec;
-  --texte: #1a1a1a;
-  --texte-doux: #4a4842;
-  --texte-faible: #6a6862;
-  --bordure: #c8c6c0;
-  --bordure-douce: #eceae4;
-  --accent: #1e5aa8;
-  --accent-doux: #eaf1f9;
-  --compression: #2f5d8a;
-  --traction: #a8442a;
-  --beton: #e7eaee;
-  --neutre: #9a978f;
-  --ok: #1f6f3f;      --ok-fond: #eaf4ee;
-  --alerte: #8a6d00;  --alerte-fond: #fdf6e3;
-  --refus: #a52121;   --refus-fond: #f8ecec;
-  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --rayon: 4px;
-  --rayon-petit: 3px;
-  color-scheme: light;
-}`;
 
 /**
  * LES STYLES DU TRACE, jetons compris.
@@ -132,89 +117,6 @@ svg {
   stroke-dasharray: 8 6;
 }
 .schema-poteau .bord-libre { fill: none; stroke: var(--texte); stroke-width: 3; }`;
-
-const DECLARATION_XML = '<?xml version="1.0" encoding="UTF-8"?>';
-const NAMESPACE_SVG = 'http://www.w3.org/2000/svg';
-
-/** Les styles voyagent dans un CDATA : ils contiennent des `>` et des `&`. */
-function baliseStyle(styles: string): string {
-  return `<style type="text/css"><![CDATA[\n${styles}\n]]></style>`;
-}
-
-/**
- * Enveloppe un SVG de la page dans un document autonome, styles INLINES.
- *
- * N'en retient que le SVG : ce que la page place autour (legendes, notes) est
- * du HTML, et le laisser casserait le XML.
- */
-export function svgAutonome(svg: string, styles: string): string {
-  const debut = /<svg\b[^>]*>/i.exec(svg);
-  const fin = svg.lastIndexOf('</svg>');
-
-  // Rien d'exploitable : un document vide mais VALIDE, plutot qu'un fichier
-  // tronque que le lecteur ne saurait pas ouvrir.
-  if (debut === null || fin < debut.index) {
-    return `${DECLARATION_XML}\n<svg xmlns="${NAMESPACE_SVG}">${baliseStyle(styles)}</svg>`;
-  }
-
-  const ouverture = /\bxmlns\s*=/.test(debut[0])
-    ? debut[0]
-    : debut[0].replace(/^<svg\b/i, `<svg xmlns="${NAMESPACE_SVG}"`);
-
-  return (
-    `${DECLARATION_XML}\n${ouverture}${baliseStyle(styles)}` +
-    `${svg.slice(debut.index + debut[0].length, fin)}</svg>`
-  );
-}
-
-// --- CSV ---------------------------------------------------------------------
-
-/**
- * Le point-virgule, et pas la virgule.
- *
- * Le separateur decimal de l'interface est la VIRGULE — `nombreFr` la produit
- * partout. La prendre aussi comme separateur de colonnes couperait chaque
- * nombre en deux a l'ouverture.
- */
-const SEPARATEUR = ';';
-const FIN_DE_LIGNE = '\r\n';
-
-/**
- * Marque d'ordre des octets. Sans elle, un tableur lit le fichier dans
- * l'encodage de la machine et massacre les accents comme les σ, ρ et ν dont
- * les libelles de ce module sont peuples.
- */
-const BOM = '﻿';
-
-function champCsv(valeur: string): string {
-  if (!/[;"\r\n]/.test(valeur)) return valeur;
-  return `"${valeur.replace(/"/g, '""')}"`;
-}
-
-function ligneCsv(champs: string[]): string {
-  return champs.map(champCsv).join(SEPARATEUR);
-}
-
-/**
- * Les resultats affiches, en tableau.
- *
- * AUCUN BLOC N'EST OMIS. Ce qui n'a pas ete calcule sort avec son motif : une
- * absence silencieuse ferait croire au lecteur que la verification a eu lieu.
- */
-export function resultatsEnCsv(blocs: BlocExport[]): string {
-  const lignes = [ligneCsv(['Bloc', 'Symbole', 'Grandeur', 'Valeur'])];
-
-  for (const bloc of blocs) {
-    for (const l of bloc.lignes) {
-      lignes.push(ligneCsv([bloc.titre, l.symbole, l.libelle, l.valeur]));
-    }
-    // Le motif sort meme sans ligne : c'est justement le cas ou il porte
-    // toute l'information.
-    if (bloc.note !== null) lignes.push(ligneCsv([bloc.titre, '', bloc.note, '']));
-  }
-
-  return BOM + lignes.join(FIN_DE_LIGNE) + FIN_DE_LIGNE;
-}
 
 // --- Note de calcul ----------------------------------------------------------
 
