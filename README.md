@@ -129,3 +129,10 @@ Trois sorties quittent la page. Les **dessins** partent en SVG autonomes, jetons
 La **note de calcul** est un document HTML autonome, ouvert dans un onglet et imprimable en PDF par le navigateur, avec repli sur un telechargement si l'ouverture est bloquee. Elle porte les donnees d'entree, les deux schemas, puis les valeurs intermediaires avant le verdict : un `v_Rd,c` sans son `k`, son `rho_l` et son `sigma_cp` n'est pas verifiable par un tiers, et c'est a cela qu'une note sert. L'avertissement de perimetre en rive et en angle y figure en evidence.
 
 C'est un **compte rendu**, pas une justification reglementaire signee : elle porte les hypotheses, elle n'engage personne.
+
+
+## Licence
+
+MIT — voir [LICENSE](LICENSE). Le logiciel est fourni « tel quel », **sans garantie
+d'aucune sorte**, expresse ou implicite. C'est une aide au calcul : les résultats
+relèvent de la responsabilité de l'ingénieur qui les emploie et doivent être vérifiés.
