@@ -251,10 +251,13 @@ function sansCalculAExporter(): void {
   );
 }
 
-function exporterDessins(sortie: EtatExportable): void {
-  const base = baseDeNom(sortie);
-  telecharger(`${base}-positions.svg`, svgAutonome(sortie.positions, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
-  telecharger(`${base}-perimetres.svg`, svgAutonome(sortie.schema, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
+/**
+ * Un dessin par bouton : deux telechargements lances d'un meme clic, les
+ * navigateurs bloquent le second sans prevenir.
+ */
+function exporterDessin(sortie: EtatExportable, quoi: 'positions' | 'perimetres'): void {
+  const svg = quoi === 'positions' ? sortie.positions : sortie.schema;
+  telecharger(`${baseDeNom(sortie)}-${quoi}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
 }
 
 function exporterResultats(sortie: EtatExportable): void {
@@ -298,7 +301,8 @@ document.addEventListener('click', (evenement) => {
     sansCalculAExporter();
     return;
   }
-  if (action === 'exporter-dessins') exporterDessins(derniereSortie);
+  if (action === 'exporter-positions') exporterDessin(derniereSortie, 'positions');
+  else if (action === 'exporter-perimetres') exporterDessin(derniereSortie, 'perimetres');
   else if (action === 'exporter-resultats') exporterResultats(derniereSortie);
   else if (action === 'exporter-note') exporterNote(derniereSortie);
 });
