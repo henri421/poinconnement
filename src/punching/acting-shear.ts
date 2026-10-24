@@ -48,16 +48,16 @@ export function coefficientBetaSimplifie(position: PositionPoteau): number {
  */
 export function contrainteSollicitante(V_Ed: number, beta: number, u: number, d: number): number {
   if (!Number.isFinite(V_Ed) || V_Ed < 0) {
-    throw new Error("V_Ed doit etre un effort positif ou nul (kN).");
+    throw new Error('V_Ed doit être un effort positif ou nul (kN).');
   }
   if (!Number.isFinite(beta) || beta <= 0) {
-    throw new Error('Le coefficient beta doit etre un nombre strictement positif (-).');
+    throw new Error('Le coefficient beta doit être un nombre strictement positif (-).');
   }
   if (!Number.isFinite(u) || u <= 0) {
-    throw new Error('Le perimetre u doit etre un nombre strictement positif (mm).');
+    throw new Error('Le périmètre u doit être un nombre strictement positif (mm).');
   }
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('La hauteur utile d doit etre un nombre strictement positif (mm).');
+    throw new Error('La hauteur utile d doit être un nombre strictement positif (mm).');
   }
 
   // 1000 : passage des kN aux N, les longueurs etant en mm et le resultat en MPa.

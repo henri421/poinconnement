@@ -42,10 +42,10 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
   const m = sortie.modele;
   const geometrie =
     m.forme === 'circulaire'
-      ? [{ symbole: 'D', libelle: 'diametre du poteau', valeur: `${aff(m.D, 3)} mm` }]
+      ? [{ symbole: 'D', libelle: 'diamètre du poteau', valeur: `${aff(m.D, 3)} mm` }]
       : [
-          { symbole: 'c1', libelle: 'cote perpendiculaire au bord libre', valeur: `${aff(m.c1, 3)} mm` },
-          { symbole: 'c2', libelle: 'cote parallele au bord libre', valeur: `${aff(m.c2, 3)} mm` },
+          { symbole: 'c1', libelle: 'côté perpendiculaire au bord libre', valeur: `${aff(m.c1, 3)} mm` },
+          { symbole: 'c2', libelle: 'côté parallèle au bord libre', valeur: `${aff(m.c2, 3)} mm` },
         ];
 
   return [
@@ -54,9 +54,9 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
       lignes: [
         { symbole: 'd_y', libelle: 'hauteur utile, direction y', valeur: `${aff(m.d_y, 3)} mm` },
         { symbole: 'd_z', libelle: 'hauteur utile, direction z', valeur: `${aff(m.d_z, 3)} mm` },
-        { symbole: 'f_ck', libelle: 'resistance caracteristique du beton', valeur: `${aff(m.f_ck, 3)} MPa` },
-        { symbole: 'rho_ly', libelle: 'taux d armature longitudinale, direction y', valeur: aff(m.rho_ly, 3) },
-        { symbole: 'rho_lz', libelle: 'taux d armature longitudinale, direction z', valeur: aff(m.rho_lz, 3) },
+        { symbole: 'f_ck', libelle: 'résistance caractéristique du béton', valeur: `${aff(m.f_ck, 3)} MPa` },
+        { symbole: 'rho_ly', libelle: "taux d'armature longitudinale, direction y", valeur: aff(m.rho_ly, 3) },
+        { symbole: 'rho_lz', libelle: "taux d'armature longitudinale, direction z", valeur: aff(m.rho_lz, 3) },
       ],
       note: null,
     },
@@ -71,7 +71,7 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
     },
     {
       titre: 'Sollicitation',
-      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinconnement', valeur: `${aff(m.V_Ed, 3)} kN` }],
+      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinçonnement', valeur: `${aff(m.V_Ed, 3)} kN` }],
       note: null,
     },
   ];
@@ -81,7 +81,7 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
 export function blocsDeResultat(sortie: EtatExportable): BlocExport[] {
   return [
     {
-      titre: 'Verification (§6.4)',
+      titre: 'Vérification (§6.4)',
       lignes: lignesDuResultat(sortie.resultat),
       note: noteSurU0(sortie.donnees.poteau, sortie.resultat),
     },
@@ -101,11 +101,11 @@ export function blocsDeResultat(sortie: EtatExportable): BlocExport[] {
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES: readonly string[] = [
-  'Dalle pleine d epaisseur constante : ni chapiteau, ni dalle allegee, ni precontrainte.',
-  'Coefficient beta par valeurs simplifiees du §6.4.3(6) ou impose ; pas de calcul par W1.',
-  'Aucune ouverture a proximite du poteau (§6.4.2(3)).',
-  'Dispositions constructives des armatures de poinconnement (§9.4.3) non verifiees.',
-  'Valeurs recommandees de l EN 1992-1-1 ; une annexe nationale peut les modifier.',
+  "Dalle pleine d'épaisseur constante : ni chapiteau, ni dalle allégée, ni précontrainte.",
+  'Coefficient beta par valeurs simplifiées du §6.4.3(6) ou imposé ; pas de calcul par W1.',
+  'Aucune ouverture à proximité du poteau (§6.4.2(3)).',
+  'Dispositions constructives des armatures de poinçonnement (§9.4.3) non vérifiées.',
+  "Valeurs recommandées de l'EN 1992-1-1 ; une annexe nationale peut les modifier.",
 ];
 
 /** Les mises en garde a placer en evidence dans la note. */

@@ -47,11 +47,11 @@ export function avertissementPerimetre(position: PositionPoteau): string | null 
   }
   const nom = position === 'rive' ? 'de rive' : "d'angle";
   return (
-    `Poteau ${nom} : le perimetre de controle retenu ici est l'offset a 2d ecrete au bord ` +
-    "libre. L'EN 1992-1-1 prevoit, pour cette position, de retenir un perimetre PLUS COURT " +
-    "lorsque sa figure en donne un ; cette disposition n'est pas implementee. Ne pas " +
-    "l'appliquer surestime u1, donc sous-estime v_Ed : le resultat ci-dessous peut etre " +
-    'NON CONSERVATIF. A verifier a la main, en particulier sur un poteau allonge.'
+    `Poteau ${nom} : le périmètre de contrôle retenu ici est l'offset à 2d, écrêté au bord ` +
+    "libre. L'EN 1992-1-1 prévoit, pour cette position, de retenir un périmètre PLUS COURT " +
+    "lorsque sa figure en donne un ; cette disposition n'est pas implémentée. Ne pas " +
+    "l'appliquer surestime u1, donc sous-estime v_Ed : le résultat ci-dessous peut être " +
+    'NON CONSERVATIF. À vérifier à la main, en particulier sur un poteau allongé.'
   );
 }
 
@@ -64,11 +64,11 @@ export function avertissementPerimetre(position: PositionPoteau): string | null 
 export function titreDuVerdict(verdict: Verdict): string {
   switch (verdict) {
     case 'aucune-armature-requise':
-      return 'Aucune armature de poinconnement requise';
+      return 'Aucune armature de poinçonnement requise';
     case 'dalle-trop-mince':
-      return "Dalle trop mince : ecrasement du beton au nu du poteau";
+      return 'Dalle trop mince : écrasement du béton au droit du poteau';
     case 'armatures-necessaires':
-      return 'Armatures de poinconnement a prevoir';
+      return 'Armatures de poinçonnement à prévoir';
   }
 }
 
@@ -89,25 +89,24 @@ export function lignesDuResultat(resultat: ResultatPoinconnement): LigneResultat
   const lignes: LigneResultat[] = [
     { symbole: 'd', libelle: 'hauteur utile moyenne (d_y + d_z)/2', valeur: `${aff(resultat.d, 1)} mm` },
     { symbole: 'β', libelle: "coefficient d'excentrement", valeur: aff(resultat.beta, 3) },
-    { symbole: 'u0', libelle: 'perimetre au nu du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
-    { symbole: 'u1', libelle: 'perimetre de controle de base, a 2d', valeur: `${aff(resultat.u1, 0)} mm` },
-    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au nu', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
+    { symbole: 'u0', libelle: 'périmètre au droit du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
+    { symbole: 'u1', libelle: 'périmètre de contrôle de base, à 2d', valeur: `${aff(resultat.u1, 0)} mm` },
+    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au droit du poteau', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
     { symbole: 'v_Ed(u1)', libelle: 'contrainte sollicitante sur u1', valeur: `${aff(resultat.v_Ed_u1, 3)} MPa` },
-    { symbole: 'v_Rd,c', libelle: 'resistance sans armatures, eq. (6.47)', valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
-    { symbole: 'v_Rd,max', libelle: 'ecrasement admissible au nu, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
+    { symbole: 'v_Rd,c', libelle: 'résistance sans armatures, eq. (6.47)', valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
+    { symbole: 'v_Rd,max', libelle: 'écrasement admissible au droit du poteau, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
   ];
 
   if (resultat.A_sw_requis !== undefined) {
     lignes.push({
       symbole: 'A_sw',
-      libelle: "aire d'armatures par cours satisfaisant l'eq. (6.52)",
-      valeur: `${aff(resultat.A_sw_requis, 0)} mm2`,
+      libelle: "aire d'armatures par cours satisfaisant l'eq. (6.52)",      valeur: `${aff(resultat.A_sw_requis, 0)} mm2`,
     });
   }
   if (resultat.u_out_ef !== undefined) {
     lignes.push({
       symbole: 'u_out,ef',
-      libelle: 'perimetre au-dela duquel les armatures sont inutiles',
+      libelle: 'périmètre au-delà duquel les armatures sont inutiles',
       valeur: `${aff(resultat.u_out_ef, 0)} mm`,
     });
   }
@@ -134,7 +133,7 @@ export function noteSurU0(poteau: Poteau, resultat: ResultatPoinconnement): stri
   return (
     `u0 retenu = ${aff(resultat.u0, 0)} mm : c'est la valeur du §6.4.5(3), plus courte ` +
     `que le contour du poteau en contact avec la dalle (${aff(contourDessine, 0)} mm) ` +
-    'que montre le trace. Le calcul retient la plus petite des deux.'
+    'que montre le tracé. Le calcul retient la plus petite des deux.'
   );
 }
 
@@ -143,7 +142,7 @@ export function messageDErreur(erreur: unknown): string {
   const detail =
     erreur instanceof Error && erreur.message !== ''
       ? erreur.message
-      : "cause inconnue. Verifiez les valeurs saisies.";
+      : 'cause inconnue. Vérifiez les valeurs saisies.';
   return `Calcul impossible : ${detail}`;
 }
 
@@ -167,7 +166,7 @@ type Forme =
 /** Cote strictement positif, ou refus : un trace sur une cote nulle n'a aucun sens. */
 function coteValide(valeur: number | undefined, nom: string): number {
   if (valeur === undefined || !Number.isFinite(valeur) || valeur <= 0) {
-    throw new Error(`Le trace demande ${nom} strictement positif (mm).`);
+    throw new Error(`Le tracé demande ${nom} strictement positif (mm).`);
   }
   return valeur;
 }
@@ -336,7 +335,7 @@ function bordsLibres(position: PositionPoteau, dalle: Boite): string[] {
  */
 export function schemaDuPoteau(poteau: Poteau, d: number): string {
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('Le trace demande une hauteur utile d strictement positive (mm).');
+    throw new Error('Le tracé demande une hauteur utile d strictement positive (mm).');
   }
   const forme = formeDuPoteau(poteau);
   const a = 2 * d;
@@ -363,7 +362,7 @@ export function schemaDuPoteau(poteau: Poteau, d: number): string {
   return [
     `<svg viewBox="${co(vue.xMin)} ${co(-vue.yMax)} ${co(vue.xMax - vue.xMin)} `,
     `${co(vue.yMax - vue.yMin)}" class="schema-poteau" role="img"`,
-    ' aria-label="Trace en plan du poteau et de ses perimetres de controle">',
+    ' aria-label="Tracé en plan du poteau et de ses périmètres de contrôle">',
     `<defs><clipPath id="dalle-utile"><rect ${rectangleDalle} /></clipPath></defs>`,
     `<rect data-role="dalle" class="dalle" ${rectangleDalle} />`,
     elementDuContour(forme, a, 'perimetre-u1', 'perimetre-u1'),

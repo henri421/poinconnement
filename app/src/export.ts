@@ -203,7 +203,7 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
   const hypotheses =
     note.hypotheses.length === 0
       ? ''
-      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses
+      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses
           .map((h) => `<li>${notationHtml(h)}</li>`)
           .join('')}</ul>`;
 
@@ -212,12 +212,12 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
 <title>Note de calcul — ${notationHtml(note.titre)}</title>
 <style>${styles}${STYLE_NOTE}</style></head>
 <body>
-<h1>Note de calcul — poinconnement (EN 1992-1-1:2004 §6.4)</h1>
+<h1>Note de calcul — poinçonnement (EN 1992-1-1:2004 §6.4)</h1>
 <p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)}</p>
 ${avertissements}
-<h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
-<h2>Geometrie et perimetres</h2>${dessins}
-<h2>Verifications</h2>${note.resultats.map(tableDuBloc).join('')}
+<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
+<h2>Géométrie et contours de contrôle</h2>${dessins}
+<h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
 <p class="pied">${AIDE_AU_CALCUL}</p>
 </body></html>`;

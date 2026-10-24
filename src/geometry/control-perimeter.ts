@@ -85,10 +85,10 @@ type AireChargee =
 function cotesRectangle(poteau: Poteau): { c1: number; c2: number } {
   const { c1, c2 } = poteau;
   if (c1 === undefined || !Number.isFinite(c1) || c1 <= 0) {
-    throw new Error('Poteau rectangulaire : c1 doit etre une longueur strictement positive (mm).');
+    throw new Error('Poteau rectangulaire : c1 doit être une longueur strictement positive (mm).');
   }
   if (c2 === undefined || !Number.isFinite(c2) || c2 <= 0) {
-    throw new Error('Poteau rectangulaire : c2 doit etre une longueur strictement positive (mm).');
+    throw new Error('Poteau rectangulaire : c2 doit être une longueur strictement positive (mm).');
   }
   return { c1, c2 };
 }
@@ -97,7 +97,7 @@ function cotesRectangle(poteau: Poteau): { c1: number; c2: number } {
 function diametreCercle(poteau: Poteau): number {
   const { D } = poteau;
   if (D === undefined || !Number.isFinite(D) || D <= 0) {
-    throw new Error('Poteau circulaire : D doit etre une longueur strictement positive (mm).');
+    throw new Error('Poteau circulaire : D doit être une longueur strictement positive (mm).');
   }
   return D;
 }
@@ -313,7 +313,7 @@ function longueurArcDansDalle(arc: Arc, demiPlans: DemiPlan[]): number {
  */
 export function perimetreDeControle(poteau: Poteau, a: number): number {
   if (!Number.isFinite(a) || a < 0) {
-    throw new Error('La distance a l aire chargee doit etre un nombre positif ou nul (mm).');
+    throw new Error("La distance à l'aire chargée doit être un nombre positif ou nul (mm).");
   }
 
   const demiPlans = demiPlansDeLaDalle(poteau.position);
@@ -347,7 +347,7 @@ export function perimetreDeControle(poteau: Poteau, a: number): number {
  */
 export function perimetreAuNu(poteau: Poteau, d: number): number {
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('La hauteur utile d doit etre un nombre strictement positif (mm).');
+    throw new Error('La hauteur utile d doit être un nombre strictement positif (mm).');
   }
 
   const contourTronque = perimetreDeControle(poteau, 0);

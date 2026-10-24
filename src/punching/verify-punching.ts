@@ -108,7 +108,7 @@ function aff(valeur: number, decimales: number): string {
 export function hauteurUtileMoyenne(d_y: number, d_z: number): number {
   if (!Number.isFinite(d_y) || d_y <= 0 || !Number.isFinite(d_z) || d_z <= 0) {
     throw new Error(
-      'Chaque hauteur utile, d_y et d_z, doit etre un nombre strictement positif (mm).',
+      'Chaque hauteur utile, d_y et d_z, doit être un nombre strictement positif (mm).',
     );
   }
   return (d_y + d_z) / 2;
@@ -128,10 +128,10 @@ function aireRequise(
   const alpha = armatures.alpha ?? Math.PI / 2;
   const f_ywd_ef = limiteElastiqueEfficace(d, armatures.f_ywd);
   if (!Number.isFinite(armatures.s_r) || armatures.s_r <= 0) {
-    throw new Error('L espacement radial s_r doit etre un nombre strictement positif (mm).');
+    throw new Error("L'espacement radial s_r doit être un nombre strictement positif (mm).");
   }
   if (!Number.isFinite(alpha) || alpha <= 0 || alpha > Math.PI / 2) {
-    throw new Error("L'angle alpha des armatures doit etre dans ]0 ; pi/2] (rad).");
+    throw new Error("L'angle alpha des armatures doit être dans ]0 ; pi/2] (rad).");
   }
 
   return ((v_Ed - 0.75 * v_Rd_c) * u1 * armatures.s_r) / (1.5 * f_ywd_ef * Math.sin(alpha));
@@ -168,10 +168,10 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
       ...commun,
       verdict: 'dalle-trop-mince',
       motif:
-        `Ecrasement du beton au nu du poteau : v_Ed(u0) = ${aff(v_Ed_u0, 3)} MPa depasse ` +
+        `Écrasement du béton au droit du poteau : v_Ed(u0) = ${aff(v_Ed_u0, 3)} MPa dépasse ` +
         `v_Rd,max = ${aff(v_Rd_max, 3)} MPa. La dalle est trop mince ; des armatures de ` +
-        "poinconnement n'y changeraient rien. Il faut epaissir la dalle, elargir le poteau, " +
-        'ou monter en resistance de beton.',
+        "poinçonnement n'y changeraient rien. Il faut épaissir la dalle, élargir le poteau, " +
+        'ou monter en résistance de béton.',
     };
   }
 
@@ -181,7 +181,7 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
       verdict: 'aucune-armature-requise',
       motif:
         `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa reste sous v_Rd,c = ${aff(v_Rd_c, 3)} MPa : ` +
-        "aucune armature de poinconnement n'est requise.",
+        "aucune armature de poinçonnement n'est requise.",
     };
   }
 
@@ -195,9 +195,9 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
     ...commun,
     verdict: 'armatures-necessaires',
     motif:
-      `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa depasse v_Rd,c = ${aff(v_Rd_c, 3)} MPa sans ` +
-      'atteindre l ecrasement au nu : des armatures de poinconnement sont necessaires ' +
-      `jusqu'au perimetre u_out,ef = ${aff(u_out_ef, 0)} mm.`,
+      `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa dépasse v_Rd,c = ${aff(v_Rd_c, 3)} MPa sans ` +
+      "atteindre l'écrasement au droit du poteau : des armatures de poinçonnement sont nécessaires " +
+      `jusqu'au périmètre u_out,ef = ${aff(u_out_ef, 0)} mm.`,
     A_sw_requis,
     u_out_ef,
   };

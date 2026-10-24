@@ -45,13 +45,13 @@ export function resistanceMaximale(
   alpha_cc: number = ALPHA_CC_PAR_DEFAUT,
 ): number {
   if (!Number.isFinite(f_ck) || f_ck <= 0) {
-    throw new Error('f_ck doit etre un nombre strictement positif (MPa).');
+    throw new Error('f_ck doit être un nombre strictement positif (MPa).');
   }
   if (!Number.isFinite(gamma_c) || gamma_c <= 0) {
-    throw new Error('gamma_c doit etre un nombre strictement positif (-).');
+    throw new Error('gamma_c doit être un nombre strictement positif (-).');
   }
   if (!Number.isFinite(alpha_cc) || alpha_cc <= 0) {
-    throw new Error('alpha_cc doit etre un nombre strictement positif (-).');
+    throw new Error('alpha_cc doit être un nombre strictement positif (-).');
   }
 
   const nu = 0.6 * (1 - f_ck / 250);
@@ -69,10 +69,10 @@ export function resistanceMaximale(
  */
 export function limiteElastiqueEfficace(d: number, f_ywd: number): number {
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('La hauteur utile d doit etre un nombre strictement positif (mm).');
+    throw new Error('La hauteur utile d doit être un nombre strictement positif (mm).');
   }
   if (!Number.isFinite(f_ywd) || f_ywd <= 0) {
-    throw new Error('f_ywd doit etre un nombre strictement positif (MPa).');
+    throw new Error('f_ywd doit être un nombre strictement positif (MPa).');
   }
   return Math.min(250 + 0.25 * d, f_ywd);
 }
@@ -90,19 +90,19 @@ export function resistanceAvecArmatures(donnees: DonneesArmatures): number {
   const alpha = donnees.alpha ?? Math.PI / 2;
 
   if (!Number.isFinite(v_Rd_c) || v_Rd_c < 0) {
-    throw new Error('v_Rd,c doit etre un nombre positif ou nul (MPa).');
+    throw new Error('v_Rd,c doit être un nombre positif ou nul (MPa).');
   }
   if (!Number.isFinite(s_r) || s_r <= 0) {
-    throw new Error('L espacement radial s_r doit etre un nombre strictement positif (mm).');
+    throw new Error("L'espacement radial s_r doit être un nombre strictement positif (mm).");
   }
   if (!Number.isFinite(A_sw) || A_sw < 0) {
-    throw new Error('A_sw doit etre une aire positive ou nulle (mm2).');
+    throw new Error('A_sw doit être une aire positive ou nulle (mm2).');
   }
   if (!Number.isFinite(u1) || u1 <= 0) {
-    throw new Error('Le perimetre u1 doit etre un nombre strictement positif (mm).');
+    throw new Error('Le périmètre u1 doit être un nombre strictement positif (mm).');
   }
   if (!Number.isFinite(alpha) || alpha <= 0 || alpha > Math.PI / 2) {
-    throw new Error("L'angle alpha des armatures doit etre dans ]0 ; pi/2] (rad).");
+    throw new Error("L'angle alpha des armatures doit être dans ]0 ; pi/2] (rad).");
   }
 
   const f_ywd_ef = limiteElastiqueEfficace(d, f_ywd);
@@ -127,16 +127,16 @@ export function perimetreExterieur(
   d: number,
 ): number {
   if (!Number.isFinite(V_Ed) || V_Ed < 0) {
-    throw new Error('V_Ed doit etre un effort positif ou nul (kN).');
+    throw new Error('V_Ed doit être un effort positif ou nul (kN).');
   }
   if (!Number.isFinite(beta) || beta <= 0) {
-    throw new Error('Le coefficient beta doit etre un nombre strictement positif (-).');
+    throw new Error('Le coefficient beta doit être un nombre strictement positif (-).');
   }
   if (!Number.isFinite(v_Rd_c) || v_Rd_c <= 0) {
-    throw new Error('v_Rd,c doit etre un nombre strictement positif (MPa).');
+    throw new Error('v_Rd,c doit être un nombre strictement positif (MPa).');
   }
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('La hauteur utile d doit etre un nombre strictement positif (mm).');
+    throw new Error('La hauteur utile d doit être un nombre strictement positif (mm).');
   }
 
   // 1000 : passage des kN aux N.

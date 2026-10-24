@@ -39,7 +39,7 @@ import './style.css';
 function exige<T extends Element>(selecteur: string): T {
   const trouve = document.querySelector(selecteur);
   if (trouve === null) {
-    throw new Error(`element absent de la page : ${selecteur}`);
+    throw new Error(`élément absent de la page : ${selecteur}`);
   }
   return trouve as T;
 }
@@ -166,8 +166,8 @@ function dateDuJour(): string {
 
 function sansCalculAExporter(): void {
   afficherErreur(
-    'Aucun calcul valide a exporter. Les sorties decrivent le dernier calcul reussi : ' +
-      'corriger la saisie, puis reessayer.'
+    'Aucun calcul valide à exporter. Les sorties décrivent le dernier calcul réussi : ' +
+      'corriger la saisie, puis réessayer.'
   );
 }
 

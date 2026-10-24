@@ -67,7 +67,7 @@ function casDeFigure(): Cas[] {
   return [
     {
       position: 'interieur',
-      nom: 'poteau interieur',
+      nom: 'poteau intérieur',
       poteau: { x: interieurX, y: interieurHaut },
       // Contour ferme : quatre cotes decales et quatre quarts de cercle.
       perimetre: [
@@ -169,7 +169,7 @@ export function schemaDesPositions(courante: PositionPoteau): string {
 
   return [
     `<svg viewBox="0 0 ${LARGEUR} ${HAUTEUR}" class="schema-positions" role="img"`,
-    ' aria-label="Les trois positions de poteau et leur coefficient beta simplifie">',
+    ' aria-label="Les trois positions de poteau et leur coefficient beta simplifié">',
     '<g class="dalle">',
     `<rect class="dalle-fond" x="${BORD_GAUCHE}" y="${BORD_HAUT}"`,
     ` width="${BORD_DROIT - BORD_GAUCHE}" height="${BORD_BAS - BORD_HAUT}" />`,

@@ -121,7 +121,7 @@ export function champsDepuisModele(modele: ModeleSaisie): Record<string, string>
 
 /** Echec de lecture, nommant le champ fautif pour qu'on sache ou corriger. */
 function refus(champ: string): Lecture {
-  return { ok: false, message: `Saisie invalide : le champ ${champ} doit etre un nombre.` };
+  return { ok: false, message: `Saisie invalide : le champ ${champ} doit être un nombre.` };
 }
 
 /**

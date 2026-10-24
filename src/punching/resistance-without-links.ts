@@ -47,7 +47,7 @@ export interface DonneesResistanceSansArmatures {
 /** Coefficient de hauteur `k = 1 + racine(200/d) <= 2,0`, d en mm. */
 export function coefficientHauteur(d: number): number {
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('La hauteur utile d doit etre un nombre strictement positif (mm).');
+    throw new Error('La hauteur utile d doit être un nombre strictement positif (mm).');
   }
   return Math.min(2, 1 + Math.sqrt(200 / d));
 }
@@ -60,10 +60,10 @@ export function coefficientHauteur(d: number): number {
  */
 export function tauxArmatureLongitudinal(rho_ly: number, rho_lz: number): number {
   if (!Number.isFinite(rho_ly) || rho_ly < 0) {
-    throw new Error('Le taux d armature rho_ly doit etre un nombre positif ou nul (-).');
+    throw new Error("Le taux d'armature rho_ly doit être un nombre positif ou nul (-).");
   }
   if (!Number.isFinite(rho_lz) || rho_lz < 0) {
-    throw new Error('Le taux d armature rho_lz doit etre un nombre positif ou nul (-).');
+    throw new Error("Le taux d'armature rho_lz doit être un nombre positif ou nul (-).");
   }
   return Math.min(RHO_L_MAXIMAL, Math.sqrt(rho_ly * rho_lz));
 }
@@ -71,10 +71,10 @@ export function tauxArmatureLongitudinal(rho_ly: number, rho_lz: number): number
 /** Plancher de resistance `v_min = 0,035 * k^1,5 * racine(f_ck)` (MPa), eq. (6.3N). */
 export function contrainteMinimale(k: number, f_ck: number): number {
   if (!Number.isFinite(k) || k <= 0) {
-    throw new Error('Le coefficient k doit etre un nombre strictement positif (-).');
+    throw new Error('Le coefficient k doit être un nombre strictement positif (-).');
   }
   if (!Number.isFinite(f_ck) || f_ck <= 0) {
-    throw new Error('f_ck doit etre un nombre strictement positif (MPa).');
+    throw new Error('f_ck doit être un nombre strictement positif (MPa).');
   }
   return 0.035 * Math.pow(k, 1.5) * Math.sqrt(f_ck);
 }
@@ -87,13 +87,13 @@ export function resistanceSansArmatures(donnees: DonneesResistanceSansArmatures)
   const sigma_cz = donnees.sigma_cz ?? 0;
 
   if (!Number.isFinite(f_ck) || f_ck <= 0) {
-    throw new Error('f_ck doit etre un nombre strictement positif (MPa).');
+    throw new Error('f_ck doit être un nombre strictement positif (MPa).');
   }
   if (!Number.isFinite(gamma_c) || gamma_c <= 0) {
-    throw new Error('gamma_c doit etre un nombre strictement positif (-).');
+    throw new Error('gamma_c doit être un nombre strictement positif (-).');
   }
   if (!Number.isFinite(sigma_cy) || !Number.isFinite(sigma_cz)) {
-    throw new Error('Les contraintes normales sigma_cy et sigma_cz doivent etre finies (MPa).');
+    throw new Error('Les contraintes normales sigma_cy et sigma_cz doivent être finies (MPa).');
   }
 
   const k = coefficientHauteur(d);
