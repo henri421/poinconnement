@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { JSDOM } from 'jsdom';
+import { notationHtml, texteVisible } from 'aedificium-ui';
 
 import {
   avertissementPerimetre,
@@ -188,7 +189,8 @@ describe('rendreResultat', () => {
     const resultat = resultatDuVerdict('dalle-trop-mince');
     const document = analyser(rendreResultat(resultat, poteauInterieur));
 
-    expect(document.querySelector('[data-role="motif"]')?.textContent).toBe(resultat.motif);
+    // Verbatim au rendu pres : la notation met v_Ed en indice (« vEd »).
+    expect(document.querySelector('[data-role="motif"]')?.textContent).toBe(texteVisible(notationHtml(resultat.motif)));
   });
 
   it('annonce le verdict et sa classe', () => {
