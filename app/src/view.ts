@@ -16,7 +16,7 @@ import {
 } from '../../src/index';
 
 export { echapper, nombreFr } from 'aedificium-ui';
-import { echapper, nombreFr } from 'aedificium-ui';
+import { nombreFr, notationHtml } from 'aedificium-ui';
 
 /** Une grandeur du calcul, telle qu'elle se lit dans le tableau. */
 export interface LigneResultat {
@@ -378,9 +378,9 @@ function tableauDesGrandeurs(resultat: ResultatPoinconnement): string {
   const lignes = lignesDuResultat(resultat)
     .map(
       (ligne) =>
-        `<tr><th scope="row">${echapper(ligne.symbole)}</th>` +
-        `<td class="libelle">${echapper(ligne.libelle)}</td>` +
-        `<td class="valeur">${echapper(ligne.valeur)}</td></tr>`,
+        `<tr><th scope="row">${notationHtml(ligne.symbole)}</th>` +
+        `<td class="libelle">${notationHtml(ligne.libelle)}</td>` +
+        `<td class="valeur">${notationHtml(ligne.valeur)}</td></tr>`,
     )
     .join('');
   return `<table class="grandeurs"><tbody>${lignes}</tbody></table>`;
@@ -399,13 +399,13 @@ export function rendreResultat(resultat: ResultatPoinconnement, poteau: Poteau):
     '<div class="resultat">',
     `<p data-role="verdict" data-verdict="${resultat.verdict}"`,
     ` class="verdict ${classeDuVerdict(resultat.verdict)}">`,
-    `${echapper(titreDuVerdict(resultat.verdict))}</p>`,
-    `<p data-role="motif" class="motif">${echapper(resultat.motif)}</p>`,
+    `${notationHtml(titreDuVerdict(resultat.verdict))}</p>`,
+    `<p data-role="motif" class="motif">${notationHtml(resultat.motif)}</p>`,
     avertissement === null
       ? ''
-      : `<p data-role="avertissement-perimetre" class="alerte">${echapper(avertissement)}</p>`,
+      : `<p data-role="avertissement-perimetre" class="alerte">${notationHtml(avertissement)}</p>`,
     tableauDesGrandeurs(resultat),
-    note === null ? '' : `<p data-role="note-u0" class="note">${echapper(note)}</p>`,
+    note === null ? '' : `<p data-role="note-u0" class="note">${notationHtml(note)}</p>`,
     '</div>',
   ].join('');
 }

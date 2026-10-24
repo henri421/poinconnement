@@ -20,7 +20,7 @@
  */
 
 import { coefficientBetaSimplifie, type PositionPoteau } from '../../src/index';
-import { echapper } from './view';
+import { notationSvg } from 'aedificium-ui';
 
 /** Repere du dessin, en unites de viewBox. */
 const LARGEUR = 640;
@@ -132,9 +132,9 @@ function groupeDuCas(cas: Cas, courante: PositionPoteau): string {
     `<rect data-role="poteau" class="poteau" x="${cas.poteau.x}" y="${cas.poteau.y}"`,
     ` width="${COTE}" height="${COTE}" />`,
     `<text data-role="nom" class="nom" x="${cas.etiquette.x}" y="${cas.etiquette.y}">`,
-    `${echapper(cas.nom)}</text>`,
+    `${notationSvg(cas.nom)}</text>`,
     `<text data-role="beta" class="beta" x="${cas.etiquette.x}" y="${cas.etiquette.y + 22}">`,
-    `${echapper(`β = ${beta}`)}</text>`,
+    `${notationSvg(`beta = ${beta}`)}</text>`,
     '</g>',
   ].join('');
 }
@@ -164,7 +164,7 @@ export function schemaDesPositions(courante: PositionPoteau): string {
   const conditions = CONDITIONS.map(
     (ligne, index) =>
       `<text class="conditions" x="${BORD_GAUCHE}" y="${BORD_BAS + 34 + index * 17}">` +
-      `${echapper(ligne)}</text>`,
+      `${notationSvg(ligne)}</text>`,
   ).join('');
 
   return [
@@ -176,7 +176,7 @@ export function schemaDesPositions(courante: PositionPoteau): string {
     `<path class="bord-libre" d="M ${BORD_GAUCHE} ${BORD_HAUT} V ${BORD_BAS}`,
     ` H ${BORD_DROIT}" />`,
     `<text class="bord-libre-nom" x="${BORD_GAUCHE + 6}" y="${BORD_HAUT + 18}">`,
-    'bords libres de la dalle</text>',
+    `${notationSvg('bords libres de la dalle')}</text>`,
     '</g>',
     ...cas,
     conditions,

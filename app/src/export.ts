@@ -1,7 +1,7 @@
 import type { LigneResultat } from './view';
 import {
   JETONS,
-  echapper,
+  notationHtml,
   resultatsEnCsv as resultatsEnCsvCommun,
   svgAutonome as svgAutonomeCommun,
 } from 'aedificium-ui';
@@ -33,7 +33,7 @@ export function resultatsEnCsv(blocs: BlocExport[]): string {
 /** Un bloc affichable, tel que l'ecran le montre. */
 export interface BlocExport {
   titre: string;
-  lignes: LigneResultat[];
+  lignes: readonly LigneResultat[];
   /** Motif d'indisponibilite, ou precision. `null` s'il n'y en a pas. */
   note: string | null;
 }
@@ -128,8 +128,8 @@ export interface NoteDeCalcul {
   dessins: string[];
   resultats: BlocExport[];
   /** Mises en garde a placer en evidence, avant les resultats. */
-  avertissements: string[];
-  hypotheses: string[];
+  avertissements: readonly string[];
+  hypotheses: readonly string[];
 }
 
 const AIDE_AU_CALCUL =
@@ -167,18 +167,18 @@ function tableDuBloc(bloc: BlocExport): string {
   const lignes = bloc.lignes
     .map(
       (l) =>
-        `<tr><td class="sym">${echapper(l.symbole)}</td>` +
-        `<td class="lib">${echapper(l.libelle)}</td>` +
-        `<td class="val">${echapper(l.valeur)}</td></tr>`
+        `<tr><td class="sym">${notationHtml(l.symbole)}</td>` +
+        `<td class="lib">${notationHtml(l.libelle)}</td>` +
+        `<td class="val">${notationHtml(l.valeur)}</td></tr>`
     )
     .join('');
 
   const table = lignes === '' ? '' : `<table>${lignes}</table>`;
   // Le motif est rendu MEME sans ligne : c'est justement le cas ou il porte
   // toute l'information.
-  const note = bloc.note === null ? '' : `<p class="note">${echapper(bloc.note)}</p>`;
+  const note = bloc.note === null ? '' : `<p class="note">${notationHtml(bloc.note)}</p>`;
 
-  return `<h3>${echapper(bloc.titre)}</h3>${table}${note}`;
+  return `<h3>${notationHtml(bloc.titre)}</h3>${table}${note}`;
 }
 
 /**
@@ -195,7 +195,7 @@ function tableDuBloc(bloc: BlocExport): string {
  */
 export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
   const avertissements = note.avertissements
-    .map((a) => `<p class="avertissement">${echapper(a)}</p>`)
+    .map((a) => `<p class="avertissement">${notationHtml(a)}</p>`)
     .join('');
 
   const dessins = note.dessins.map((svg) => `<div class="dessin">${svg}</div>`).join('');
@@ -204,16 +204,16 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
     note.hypotheses.length === 0
       ? ''
       : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses
-          .map((h) => `<li>${echapper(h)}</li>`)
+          .map((h) => `<li>${notationHtml(h)}</li>`)
           .join('')}</ul>`;
 
   return `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8" />
-<title>Note de calcul — ${echapper(note.titre)}</title>
+<title>Note de calcul — ${notationHtml(note.titre)}</title>
 <style>${styles}${STYLE_NOTE}</style></head>
 <body>
 <h1>Note de calcul — poinconnement (EN 1992-1-1:2004 §6.4)</h1>
-<p class="date">${echapper(note.titre)} · ${echapper(note.date)}</p>
+<p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)}</p>
 ${avertissements}
 <h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
 <h2>Geometrie et perimetres</h2>${dessins}
