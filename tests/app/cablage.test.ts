@@ -219,7 +219,7 @@ describe('les saisies invalides', () => {
 
     saisir(dom, 'V_Ed', 'beaucoup');
 
-    expect(erreurVisible(dom)).toContain('V_Ed');
+    expect(erreurVisible(dom)).toContain('VEd');
     expect(verdict(dom)).toBe(dernierValide);
   });
 
