@@ -16,7 +16,11 @@ import {
 } from '../../src/index';
 
 export { echapper, nombreFr } from 'aedificium-ui';
-import { nombreFr, notationHtml } from 'aedificium-ui';
+import { nombreAffiche, notationHtml } from 'aedificium-ui';
+
+/** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
+const aff = (valeur: number, decimales: number): string =>
+  nombreAffiche(valeur, Math.min(decimales, 3));
 
 /** Une grandeur du calcul, telle qu'elle se lit dans le tableau. */
 export interface LigneResultat {
@@ -83,28 +87,28 @@ export function classeDuVerdict(verdict: Verdict): string {
 /** Toutes les grandeurs du calcul, dans l'ordre ou on les relit. */
 export function lignesDuResultat(resultat: ResultatPoinconnement): LigneResultat[] {
   const lignes: LigneResultat[] = [
-    { symbole: 'd', libelle: 'hauteur utile moyenne (d_y + d_z)/2', valeur: `${nombreFr(resultat.d, 1)} mm` },
-    { symbole: 'β', libelle: "coefficient d'excentrement", valeur: nombreFr(resultat.beta, 3) },
-    { symbole: 'u0', libelle: 'perimetre au nu du poteau', valeur: `${nombreFr(resultat.u0, 0)} mm` },
-    { symbole: 'u1', libelle: 'perimetre de controle de base, a 2d', valeur: `${nombreFr(resultat.u1, 0)} mm` },
-    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au nu', valeur: `${nombreFr(resultat.v_Ed_u0, 3)} MPa` },
-    { symbole: 'v_Ed(u1)', libelle: 'contrainte sollicitante sur u1', valeur: `${nombreFr(resultat.v_Ed_u1, 3)} MPa` },
-    { symbole: 'v_Rd,c', libelle: 'resistance sans armatures, eq. (6.47)', valeur: `${nombreFr(resultat.v_Rd_c, 3)} MPa` },
-    { symbole: 'v_Rd,max', libelle: 'ecrasement admissible au nu, §6.4.5(3)', valeur: `${nombreFr(resultat.v_Rd_max, 3)} MPa` },
+    { symbole: 'd', libelle: 'hauteur utile moyenne (d_y + d_z)/2', valeur: `${aff(resultat.d, 1)} mm` },
+    { symbole: 'β', libelle: "coefficient d'excentrement", valeur: aff(resultat.beta, 3) },
+    { symbole: 'u0', libelle: 'perimetre au nu du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
+    { symbole: 'u1', libelle: 'perimetre de controle de base, a 2d', valeur: `${aff(resultat.u1, 0)} mm` },
+    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au nu', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
+    { symbole: 'v_Ed(u1)', libelle: 'contrainte sollicitante sur u1', valeur: `${aff(resultat.v_Ed_u1, 3)} MPa` },
+    { symbole: 'v_Rd,c', libelle: 'resistance sans armatures, eq. (6.47)', valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
+    { symbole: 'v_Rd,max', libelle: 'ecrasement admissible au nu, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
   ];
 
   if (resultat.A_sw_requis !== undefined) {
     lignes.push({
       symbole: 'A_sw',
       libelle: "aire d'armatures par cours satisfaisant l'eq. (6.52)",
-      valeur: `${nombreFr(resultat.A_sw_requis, 0)} mm2`,
+      valeur: `${aff(resultat.A_sw_requis, 0)} mm2`,
     });
   }
   if (resultat.u_out_ef !== undefined) {
     lignes.push({
       symbole: 'u_out,ef',
       libelle: 'perimetre au-dela duquel les armatures sont inutiles',
-      valeur: `${nombreFr(resultat.u_out_ef, 0)} mm`,
+      valeur: `${aff(resultat.u_out_ef, 0)} mm`,
     });
   }
   return lignes;
@@ -128,8 +132,8 @@ export function noteSurU0(poteau: Poteau, resultat: ResultatPoinconnement): stri
     return null;
   }
   return (
-    `u0 retenu = ${nombreFr(resultat.u0, 0)} mm : c'est la valeur du §6.4.5(3), plus courte ` +
-    `que le contour du poteau en contact avec la dalle (${nombreFr(contourDessine, 0)} mm) ` +
+    `u0 retenu = ${aff(resultat.u0, 0)} mm : c'est la valeur du §6.4.5(3), plus courte ` +
+    `que le contour du poteau en contact avec la dalle (${aff(contourDessine, 0)} mm) ` +
     'que montre le trace. Le calcul retient la plus petite des deux.'
   );
 }

@@ -88,6 +88,17 @@ export interface ResultatPoinconnement {
 }
 
 /**
+ * Nombre tel qu'il s'ecrit dans un motif : virgule decimale, au plus trois
+ * decimales, sans zeros inutiles. Le noyau n'importe pas `aedificium-ui` :
+ * ces quelques lignes sont recodees ici.
+ */
+function aff(valeur: number, decimales: number): string {
+  if (!Number.isFinite(valeur)) return '—';
+  const texte = valeur.toFixed(Math.min(decimales, 3)).replace('.', ',');
+  return texte.includes(',') ? texte.replace(/,?0+$/, '') : texte;
+}
+
+/**
  * Hauteur utile moyenne `d = (d_y + d_z)/2` (mm).
  *
  * Le poinconnement travaille dans les deux directions a la fois : c est la
@@ -157,8 +168,8 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
       ...commun,
       verdict: 'dalle-trop-mince',
       motif:
-        `Ecrasement du beton au nu du poteau : v_Ed(u0) = ${v_Ed_u0.toFixed(3)} MPa depasse ` +
-        `v_Rd,max = ${v_Rd_max.toFixed(3)} MPa. La dalle est trop mince ; des armatures de ` +
+        `Ecrasement du beton au nu du poteau : v_Ed(u0) = ${aff(v_Ed_u0, 3)} MPa depasse ` +
+        `v_Rd,max = ${aff(v_Rd_max, 3)} MPa. La dalle est trop mince ; des armatures de ` +
         "poinconnement n'y changeraient rien. Il faut epaissir la dalle, elargir le poteau, " +
         'ou monter en resistance de beton.',
     };
@@ -169,7 +180,7 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
       ...commun,
       verdict: 'aucune-armature-requise',
       motif:
-        `v_Ed(u1) = ${v_Ed_u1.toFixed(3)} MPa reste sous v_Rd,c = ${v_Rd_c.toFixed(3)} MPa : ` +
+        `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa reste sous v_Rd,c = ${aff(v_Rd_c, 3)} MPa : ` +
         "aucune armature de poinconnement n'est requise.",
     };
   }
@@ -184,9 +195,9 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
     ...commun,
     verdict: 'armatures-necessaires',
     motif:
-      `v_Ed(u1) = ${v_Ed_u1.toFixed(3)} MPa depasse v_Rd,c = ${v_Rd_c.toFixed(3)} MPa sans ` +
+      `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa depasse v_Rd,c = ${aff(v_Rd_c, 3)} MPa sans ` +
       'atteindre l ecrasement au nu : des armatures de poinconnement sont necessaires ' +
-      `jusqu'au perimetre u_out,ef = ${u_out_ef.toFixed(0)} mm.`,
+      `jusqu'au perimetre u_out,ef = ${aff(u_out_ef, 0)} mm.`,
     A_sw_requis,
     u_out_ef,
   };

@@ -20,7 +20,7 @@
  */
 
 import { coefficientBetaSimplifie, type PositionPoteau } from '../../src/index';
-import { notationSvg } from 'aedificium-ui';
+import { notationSvg, nombreAffiche } from 'aedificium-ui';
 
 /** Repere du dessin, en unites de viewBox. */
 const LARGEUR = 640;
@@ -115,9 +115,9 @@ function casDeFigure(): Cas[] {
   ];
 }
 
-/** Nombre a la francaise : la virgule decimale, comme sur une note de calcul. */
+/** Nombre a la francaise : la virgule decimale, sans zero inutile. */
 function virgule(valeur: number): string {
-  return String(valeur).replace('.', ',');
+  return nombreAffiche(valeur, 3);
 }
 
 /** Un cas : son perimetre en pointilles, son poteau, son nom et son beta. */

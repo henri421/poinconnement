@@ -7,9 +7,14 @@
  */
 
 import type { DonneesPoinconnement, PositionPoteau, ResultatPoinconnement } from '../../src/index';
+import { nombreAffiche } from 'aedificium-ui';
 import type { ModeleSaisie } from './form';
 import type { BlocExport } from './export';
 import { avertissementPerimetre, lignesDuResultat, noteSurU0, titreDuVerdict } from './view';
+
+/** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
+const aff = (valeur: number, decimales: number): string =>
+  nombreAffiche(valeur, Math.min(decimales, 3));
 
 /** Libelles des valeurs d'union, jamais affichees par leur cle. */
 const LIBELLES_FORME: Readonly<Record<ModeleSaisie['forme'], string>> = {
@@ -37,21 +42,21 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
   const m = sortie.modele;
   const geometrie =
     m.forme === 'circulaire'
-      ? [{ symbole: 'D', libelle: 'diametre du poteau', valeur: `${m.D} mm` }]
+      ? [{ symbole: 'D', libelle: 'diametre du poteau', valeur: `${aff(m.D, 3)} mm` }]
       : [
-          { symbole: 'c1', libelle: 'cote perpendiculaire au bord libre', valeur: `${m.c1} mm` },
-          { symbole: 'c2', libelle: 'cote parallele au bord libre', valeur: `${m.c2} mm` },
+          { symbole: 'c1', libelle: 'cote perpendiculaire au bord libre', valeur: `${aff(m.c1, 3)} mm` },
+          { symbole: 'c2', libelle: 'cote parallele au bord libre', valeur: `${aff(m.c2, 3)} mm` },
         ];
 
   return [
     {
       titre: 'Dalle',
       lignes: [
-        { symbole: 'd_y', libelle: 'hauteur utile, direction y', valeur: `${m.d_y} mm` },
-        { symbole: 'd_z', libelle: 'hauteur utile, direction z', valeur: `${m.d_z} mm` },
-        { symbole: 'f_ck', libelle: 'resistance caracteristique du beton', valeur: `${m.f_ck} MPa` },
-        { symbole: 'rho_ly', libelle: 'taux d armature longitudinale, direction y', valeur: `${m.rho_ly}` },
-        { symbole: 'rho_lz', libelle: 'taux d armature longitudinale, direction z', valeur: `${m.rho_lz}` },
+        { symbole: 'd_y', libelle: 'hauteur utile, direction y', valeur: `${aff(m.d_y, 3)} mm` },
+        { symbole: 'd_z', libelle: 'hauteur utile, direction z', valeur: `${aff(m.d_z, 3)} mm` },
+        { symbole: 'f_ck', libelle: 'resistance caracteristique du beton', valeur: `${aff(m.f_ck, 3)} MPa` },
+        { symbole: 'rho_ly', libelle: 'taux d armature longitudinale, direction y', valeur: aff(m.rho_ly, 3) },
+        { symbole: 'rho_lz', libelle: 'taux d armature longitudinale, direction z', valeur: aff(m.rho_lz, 3) },
       ],
       note: null,
     },
@@ -66,7 +71,7 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
     },
     {
       titre: 'Sollicitation',
-      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinconnement', valeur: `${m.V_Ed} kN` }],
+      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinconnement', valeur: `${aff(m.V_Ed, 3)} kN` }],
       note: null,
     },
   ];
