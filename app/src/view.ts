@@ -66,7 +66,7 @@ export function titreDuVerdict(verdict: Verdict): string {
     case 'aucune-armature-requise':
       return 'Aucune armature de poinçonnement requise';
     case 'dalle-trop-mince':
-      return 'Dalle trop mince : écrasement du béton au droit du poteau';
+      return 'Dalle trop mince : écrasement du béton au nu du poteau';
     case 'armatures-necessaires':
       return 'Armatures de poinçonnement à prévoir';
   }
@@ -89,12 +89,12 @@ export function lignesDuResultat(resultat: ResultatPoinconnement): LigneResultat
   const lignes: LigneResultat[] = [
     { symbole: 'd', libelle: 'hauteur utile moyenne (d_y + d_z)/2', valeur: `${aff(resultat.d, 1)} mm` },
     { symbole: 'β', libelle: "coefficient d'excentrement", valeur: aff(resultat.beta, 3) },
-    { symbole: 'u0', libelle: 'périmètre au droit du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
+    { symbole: 'u0', libelle: 'périmètre au nu du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
     { symbole: 'u1', libelle: 'périmètre de contrôle de base, à 2d', valeur: `${aff(resultat.u1, 0)} mm` },
-    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au droit du poteau', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
+    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au nu', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
     { symbole: 'v_Ed(u1)', libelle: 'contrainte sollicitante sur u1', valeur: `${aff(resultat.v_Ed_u1, 3)} MPa` },
     { symbole: 'v_Rd,c', libelle: 'résistance sans armatures, eq. (6.47)', valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
-    { symbole: 'v_Rd,max', libelle: 'écrasement admissible au droit du poteau, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
+    { symbole: 'v_Rd,max', libelle: 'écrasement admissible au nu du poteau, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
   ];
 
   if (resultat.A_sw_requis !== undefined) {

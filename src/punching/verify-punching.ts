@@ -168,7 +168,7 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
       ...commun,
       verdict: 'dalle-trop-mince',
       motif:
-        `Écrasement du béton au droit du poteau : v_Ed(u0) = ${aff(v_Ed_u0, 3)} MPa dépasse ` +
+        `Écrasement du béton au nu du poteau : v_Ed(u0) = ${aff(v_Ed_u0, 3)} MPa dépasse ` +
         `v_Rd,max = ${aff(v_Rd_max, 3)} MPa. La dalle est trop mince ; des armatures de ` +
         "poinçonnement n'y changeraient rien. Il faut épaissir la dalle, élargir le poteau, " +
         'ou monter en résistance de béton.',
@@ -196,7 +196,7 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
     verdict: 'armatures-necessaires',
     motif:
       `v_Ed(u1) = ${aff(v_Ed_u1, 3)} MPa dépasse v_Rd,c = ${aff(v_Rd_c, 3)} MPa sans ` +
-      "atteindre l'écrasement au droit du poteau : des armatures de poinçonnement sont nécessaires " +
+      "atteindre l'écrasement au nu du poteau : des armatures de poinçonnement sont nécessaires " +
       `jusqu'au périmètre u_out,ef = ${aff(u_out_ef, 0)} mm.`,
     A_sw_requis,
     u_out_ef,

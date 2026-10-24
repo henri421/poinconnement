@@ -218,8 +218,8 @@ describe('noteDeCalculHtml', () => {
     expect(html).toContain("aucune armature n'est requise");
   });
 
-  it('porte l avertissement d aide au calcul', () => {
-    expect(noteDeCalculHtml(note, JETONS)).toMatch(/responsabilite/i);
+  it('ne porte plus la phrase type d aide au calcul (etape 8.2)', () => {
+    expect(noteDeCalculHtml(note, JETONS)).not.toMatch(/aide au calcul/i);
   });
 
   it('ne contient aucun NaN', () => {

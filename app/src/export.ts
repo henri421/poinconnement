@@ -211,7 +211,7 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
 <p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)}</p>
 ${avertissements}
 <h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
-<h2>Géométrie et contours de contrôle</h2>${dessins}
+<h2>Géométrie et périmètres</h2>${dessins}
 <h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
 </body></html>`;
