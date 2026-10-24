@@ -200,7 +200,7 @@ describe('noteDeCalculHtml', () => {
     expect(html).toContain('Dalle D1');
     expect(html).toContain('2026-09-06');
     expect(html).toContain('<svg');
-    expect(html).toContain('v_Rd,c');
+    expect(html).toContain('v<sub>Rd,c</sub>');
     expect(html).toContain('dalle pleine');
   });
 

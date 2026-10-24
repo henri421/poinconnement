@@ -125,7 +125,7 @@ describe('les trois verdicts se lisent differemment', () => {
     const titre = titreDuVerdict('dalle-trop-mince');
 
     expect(titre.toLowerCase()).toContain('mince');
-    expect(titre.toLowerCase()).not.toContain('armatures necessaires');
+    expect(titre.toLowerCase()).not.toContain('armatures nécessaires');
   });
 });
 

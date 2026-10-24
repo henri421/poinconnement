@@ -42,8 +42,8 @@ describe('contrainteSollicitante — v_Ed = beta * V_Ed / (u * d)', () => {
   });
 
   it('un perimetre nul ou negatif leve', () => {
-    expect(() => contrainteSollicitante(900, 1.15, 0, 200)).toThrow(/perimetre/i);
-    expect(() => contrainteSollicitante(900, 1.15, -3000, 200)).toThrow(/perimetre/i);
+    expect(() => contrainteSollicitante(900, 1.15, 0, 200)).toThrow(/périmètre/i);
+    expect(() => contrainteSollicitante(900, 1.15, -3000, 200)).toThrow(/périmètre/i);
   });
 
   it('une hauteur utile nulle ou negative leve', () => {
