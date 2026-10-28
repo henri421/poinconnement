@@ -1,7 +1,6 @@
 import type { LigneResultat } from './view';
 import {
   JETONS,
-  notationHtml,
   resultatsEnCsv as resultatsEnCsvCommun,
   svgAutonome as svgAutonomeCommun,
 } from 'aedificium-ui';
@@ -23,11 +22,10 @@ export function resultatsEnCsv(blocs: BlocExport[]): string {
  *
  * Tout ici est PUR — aucune API de navigateur, aucun `document`. Le
  * telechargement lui-meme vit dans `storage.ts`. C'est ce qui rend testable
- * tout ce qui peut se tromper : composition des documents, echappement,
- * separateurs, encodage.
+ * tout ce qui peut se tromper : separateurs, encodage, styles des dessins.
  *
- * Aucune dependance ajoutee : ni generateur de PDF, ni gabarits. Le navigateur
- * imprime deja tres bien du HTML.
+ * La note de calcul ne vit PLUS ici : elle vient de `aedificium-ui`, commune
+ * aux apps de la suite (`noteDeCalculHtml`).
  */
 
 /** Un bloc affichable, tel que l'ecran le montre. */
@@ -118,101 +116,3 @@ svg {
 }
 .schema-poteau .bord-libre { fill: none; stroke: var(--texte); stroke-width: 3; }`;
 
-// --- Note de calcul ----------------------------------------------------------
-
-export interface NoteDeCalcul {
-  titre: string;
-  date: string;
-  entrees: BlocExport[];
-  /** SVG deja produits par la page, jamais redessines. */
-  dessins: string[];
-  resultats: BlocExport[];
-  /** Mises en garde a placer en evidence, avant les resultats. */
-  avertissements: readonly string[];
-  hypotheses: readonly string[];
-}
-
-const STYLE_NOTE = `
-  body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte);
-         font: 14px/1.5 var(--sans); }
-  h1 { font-size: 1.1rem; font-weight: normal; letter-spacing: .02em; margin: 0 0 .2rem; }
-  h2 { font-size: .95rem; font-weight: 600; margin: 1.6rem 0 .5rem;
-       border-bottom: 1px solid var(--bordure); padding-bottom: .25rem; }
-  h3 { font-size: .8rem; font-weight: 600; margin: 1rem 0 .35rem; }
-  .date { color: var(--texte-faible); font-size: .8rem; margin: 0 0 1.2rem; }
-  table { border-collapse: collapse; width: 100%; margin: .3rem 0 .6rem; }
-  td { border-bottom: 1px solid var(--bordure-douce); padding: .25rem .4rem; vertical-align: top; }
-  td.sym { font-family: var(--mono); width: 7rem; background: var(--surface-appui); }
-  td.lib { color: var(--texte-doux); }
-  td.val { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right;
-           white-space: nowrap; }
-  .note { color: var(--texte-doux); font-size: .8rem; margin: .2rem 0 .8rem; }
-  .avertissement { border-left: 3px solid var(--alerte); background: var(--alerte-fond);
-                   color: var(--alerte); padding: .5rem .7rem; border-radius: var(--rayon);
-                   margin: .5rem 0; font-size: .82rem; }
-  .dessin { margin: .6rem 0 1rem; page-break-inside: avoid; }
-  .dessin svg { max-width: 100%; height: auto; }
-  .pied { margin-top: 2rem; padding-top: .6rem; border-top: 1px solid var(--bordure);
-          color: var(--texte-doux); font-size: .78rem; }
-  ul { margin: .3rem 0 .6rem; padding-left: 1.1rem; color: var(--texte-doux); font-size: .82rem; }
-  @media print { body { background: #fff; padding: 0; } h2 { page-break-after: avoid; } }
-`;
-
-function tableDuBloc(bloc: BlocExport): string {
-  const lignes = bloc.lignes
-    .map(
-      (l) =>
-        `<tr><td class="sym">${notationHtml(l.symbole)}</td>` +
-        `<td class="lib">${notationHtml(l.libelle)}</td>` +
-        `<td class="val">${notationHtml(l.valeur)}</td></tr>`
-    )
-    .join('');
-
-  const table = lignes === '' ? '' : `<table>${lignes}</table>`;
-  // Le motif est rendu MEME sans ligne : c'est justement le cas ou il porte
-  // toute l'information.
-  const note = bloc.note === null ? '' : `<p class="note">${notationHtml(bloc.note)}</p>`;
-
-  return `<h3>${notationHtml(bloc.titre)}</h3>${table}${note}`;
-}
-
-/**
- * La note de calcul : un document HTML AUTONOME, imprimable en PDF par le
- * navigateur.
- *
- * Elle porte les valeurs INTERMEDIAIRES et pas seulement les resultats : un
- * `v_Rd,c` sans son `k`, son `rho_l` et son `sigma_cp` n'est pas verifiable
- * par un tiers, et c'est a cela qu'une note de calcul sert.
- *
- * Elle NE CONCLUT PAS a la place de l'ingenieur — elle rapporte les verdicts
- * des modules, sans avis de synthese — et ne masque AUCUNE verification non
- * applicable : ce qui n'a pas ete calcule y figure avec son motif.
- */
-export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
-  const avertissements = note.avertissements
-    .map((a) => `<p class="avertissement">${notationHtml(a)}</p>`)
-    .join('');
-
-  const dessins = note.dessins.map((svg) => `<div class="dessin">${svg}</div>`).join('');
-
-  const hypotheses =
-    note.hypotheses.length === 0
-      ? ''
-      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses
-          .map((h) => `<li>${notationHtml(h)}</li>`)
-          .join('')}</ul>`;
-
-  return `<!doctype html>
-<html lang="fr"><head><meta charset="utf-8" />
-<title>Note de calcul — ${notationHtml(note.titre)}</title>
-<style>${styles}${STYLE_NOTE}</style></head>
-<body>
-<h1>Note de calcul — poinçonnement (EN 1992-1-1:2004 §6.4)</h1>
-<p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)}</p>
-${avertissements}
-<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
-<h2>Géométrie et périmètres</h2>${dessins}
-<h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
-${hypotheses}
-</body></html>`;
-}

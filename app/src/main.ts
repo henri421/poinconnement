@@ -8,7 +8,7 @@
  * calcul echoue.
  */
 
-import { blocsEnTexte, notationTexte } from 'aedificium-ui';
+import { blocsEnTexte, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { schemaDesPositions } from './beta-diagram';
 import {
@@ -23,15 +23,13 @@ import {
   rendreResultat,
   schemaDuPoteau,
 } from './view';
-import { STYLES_TRACE, noteDeCalculHtml, resultatsEnCsv, svgAutonome } from './export';
+import { STYLES_TRACE, resultatsEnCsv, svgAutonome } from './export';
 import {
-  HYPOTHESES,
-  LIBELLES_POSITION,
-  avertissementsDeLaNote,
   blocsDEntree,
   blocsDeResultat,
   type EtatExportable,
 } from './sorties';
+import { noteDuCalcul } from './note';
 import { ouvrirOuTelecharger, telecharger } from './storage';
 import './style.css';
 
@@ -49,6 +47,49 @@ const corpsPositions = exige<HTMLElement>('[data-role="positions-corps"]');
 const corpsSchema = exige<HTMLElement>('[data-role="schema-corps"]');
 const corpsResultat = exige<HTMLElement>('[data-role="resultat-corps"]');
 const banniereErreur = exige<HTMLElement>('[data-role="erreur"]');
+
+// --- Cartouche ---------------------------------------------------------------
+// Projet et element saisis HORS du formulaire : ils n'entrent pas dans le
+// calcul et ne doivent donc pas le relancer.
+
+/** Cle du cartouche dans le stockage local. */
+const CLE_CARTOUCHE = 'poinconnement:cartouche';
+
+const champProjet = exige<HTMLInputElement>('[data-role="projet"]');
+const champElement = exige<HTMLInputElement>('[data-role="element"]');
+const sectionSorties = exige<HTMLElement>('#sorties');
+
+interface Cartouche {
+  projet: string;
+  element: string;
+}
+
+/** Le cartouche enregistre ; chaines vides si absent ou illisible. */
+function lireCartouche(): Cartouche {
+  try {
+    const brut = localStorage.getItem(CLE_CARTOUCHE);
+    if (brut === null) {
+      return { projet: '', element: '' };
+    }
+    const lu = JSON.parse(brut) as Record<string, unknown>;
+    return {
+      projet: typeof lu.projet === 'string' ? lu.projet : '',
+      element: typeof lu.element === 'string' ? lu.element : '',
+    };
+  } catch {
+    return { projet: '', element: '' };
+  }
+}
+
+/** Enregistre le cartouche courant. Ne recalcule rien. */
+function enregistrerCartouche(): void {
+  try {
+    const cartouche: Cartouche = { projet: champProjet.value, element: champElement.value };
+    localStorage.setItem(CLE_CARTOUCHE, JSON.stringify(cartouche));
+  } catch {
+    // Stockage indisponible : le cartouche reste valable pour la session.
+  }
+}
 
 /** Tous les champs de saisie, quelle que soit leur nature. */
 function champs(): (HTMLInputElement | HTMLSelectElement)[] {
@@ -189,17 +230,14 @@ function exporterResultats(sortie: EtatExportable): void {
 }
 
 function exporterNote(sortie: EtatExportable): void {
+  // Valeurs courantes des champs, pas celles du stockage : ce que l'on voit
+  // est ce que la note portera.
   const html = noteDeCalculHtml(
-    {
-      titre: `Poteau ${LIBELLES_POSITION[sortie.modele.position]}`,
+    noteDuCalcul(sortie, {
+      projet: champProjet.value,
+      element: champElement.value,
       date: dateDuJour(),
-      entrees: blocsDEntree(sortie),
-      // Les dessins DEJA produits, jamais redessines.
-      dessins: [sortie.positions, sortie.schema],
-      resultats: blocsDeResultat(sortie),
-      avertissements: avertissementsDeLaNote(sortie),
-      hypotheses: HYPOTHESES,
-    },
+    }),
     // STYLES_TRACE et non JETONS : la note porte les DEUX dessins en ligne,
     // et les jetons seuls les laisseraient noirs, exactement comme les SVG
     // exportes separement.
@@ -230,6 +268,12 @@ document.addEventListener('click', (evenement) => {
 ecrireModele(modeleParDefaut());
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
+
+const cartouche = lireCartouche();
+champProjet.value = cartouche.projet;
+champElement.value = cartouche.element;
+sectionSorties.addEventListener('input', enregistrerCartouche);
+
 rafraichir();
 
 // Hors navigateur (tests), pas de service worker.
