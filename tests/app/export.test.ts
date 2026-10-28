@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import {
   svgAutonome,
   resultatsEnCsv,
-  noteDeCalculHtml,
   JETONS,
   STYLES_TRACE,
 } from '../../app/src/export';
@@ -170,65 +169,5 @@ describe('resultatsEnCsv', () => {
 
     expect(csv).toContain('Armatures de poinconnement');
     expect(csv).toContain("aucune armature n'est requise");
-  });
-});
-
-describe('noteDeCalculHtml', () => {
-  const note = {
-    titre: 'Dalle D1',
-    date: '2026-09-06',
-    entrees: [BLOC],
-    dessins: ['<svg viewBox="0 0 10 10"><circle r="1"/></svg>'],
-    resultats: [BLOC, HORS_DOMAINE],
-    avertissements: ['le perimetre de controle peut etre NON CONSERVATIF en rive'],
-    hypotheses: ['dalle pleine d epaisseur constante'],
-  };
-
-  it('rend un document HTML complet et autonome', () => {
-    const html = noteDeCalculHtml(note, JETONS);
-
-    expect(html.toLowerCase()).toContain('<!doctype html>');
-    expect(html).toContain('<style');
-    // Autonome : aucune ressource externe.
-    expect(html).not.toContain('<link');
-    expect(html).not.toContain('<script');
-  });
-
-  it('porte les entrees, les dessins, les resultats et les hypotheses', () => {
-    const html = noteDeCalculHtml(note, JETONS);
-
-    expect(html).toContain('Dalle D1');
-    expect(html).toContain('2026-09-06');
-    expect(html).toContain('<svg');
-    expect(html).toContain('v<sub>Rd,c</sub>');
-    expect(html).toContain('dalle pleine');
-  });
-
-  it('porte l avertissement en evidence', () => {
-    // Il signale un resultat potentiellement NON CONSERVATIF : une note qui
-    // le tairait serait pire que pas de note.
-    const html = noteDeCalculHtml(note, JETONS);
-
-    expect(html).toContain('NON CONSERVATIF');
-    expect(html).toContain('class="avertissement"');
-  });
-
-  it('ne masque pas ce qui n a pas ete calcule', () => {
-    const html = noteDeCalculHtml(note, JETONS);
-    expect(html).toContain("aucune armature n'est requise");
-  });
-
-  it('ne porte plus la phrase type d aide au calcul (etape 8.2)', () => {
-    expect(noteDeCalculHtml(note, JETONS)).not.toMatch(/aide au calcul/i);
-  });
-
-  it('ne contient aucun NaN', () => {
-    expect(noteDeCalculHtml(note, JETONS)).not.toContain('NaN');
-  });
-
-  it('echappe le texte insere', () => {
-    const html = noteDeCalculHtml({ ...note, titre: '<script>x</script>' }, JETONS);
-    expect(html).not.toContain('<script>x</script>');
-    expect(html).toContain('&lt;script&gt;');
   });
 });

@@ -7,13 +7,14 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { NOMS_GRECS, blocsEnTexte, constatsAffichage, contenuBalise, notationHtml, texteVisible } from 'aedificium-ui';
+import { NOMS_GRECS, blocsEnTexte, noteDeCalculHtml, constatsAffichage, contenuBalise, notationHtml, texteVisible } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { donneesDepuisModele, modeleParDefaut, type ModeleSaisie } from '../../app/src/form';
 import { avertissementPerimetre, rendreResultat, schemaDuPoteau } from '../../app/src/view';
 import { schemaDesPositions } from '../../app/src/beta-diagram';
-import { STYLES_TRACE, noteDeCalculHtml, resultatsEnCsv } from '../../app/src/export';
-import { HYPOTHESES, avertissementsDeLaNote, blocsDEntree, blocsDeResultat, type EtatExportable } from '../../app/src/sorties';
+import { STYLES_TRACE, resultatsEnCsv } from '../../app/src/export';
+import { noteDuCalcul } from '../../app/src/note';
+import { blocsDEntree, blocsDeResultat, type EtatExportable } from '../../app/src/sorties';
 
 const TITRE = 'Poinçonnement';
 const lire = (chemin: string): string => readFileSync(fileURLToPath(new URL(chemin, import.meta.url)), 'utf8');
@@ -50,20 +51,7 @@ function sorties() {
   for (const m of MODELES) {
     const e = etat(m);
     ecran.push(e.schema, e.positions, rendreResultat(e.resultat, e.donnees.poteau), notationHtml(avertissementPerimetre(m.position) ?? ''));
-    notes.push(
-      noteDeCalculHtml(
-        {
-          titre: 'Poteau',
-          date: '2026-10-24',
-          entrees: blocsDEntree(e),
-          dessins: [e.positions, e.schema],
-          resultats: blocsDeResultat(e),
-          avertissements: avertissementsDeLaNote(e),
-          hypotheses: HYPOTHESES,
-        },
-        STYLES_TRACE
-      )
-    );
+    notes.push(noteDeCalculHtml(noteDuCalcul(e, { projet: 'Bureaux', element: '', date: '2026-10-24' }), STYLES_TRACE));
     const blocs = blocsEnTexte([...blocsDEntree(e), ...blocsDeResultat(e)]);
     csv.push(resultatsEnCsv(blocs.map((b) => ({ ...b, lignes: [...b.lignes] }))));
   }
