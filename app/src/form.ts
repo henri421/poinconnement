@@ -12,6 +12,7 @@
 
 import { lireNombre } from 'aedificium-ui';
 import type { DonneesPoinconnement, PositionPoteau } from '../../src/index';
+import { textes } from './textes';
 
 export type FormePoteau = 'rectangulaire' | 'circulaire';
 
@@ -121,7 +122,7 @@ export function champsDepuisModele(modele: ModeleSaisie): Record<string, string>
 
 /** Echec de lecture, nommant le champ fautif pour qu'on sache ou corriger. */
 function refus(champ: string): Lecture {
-  return { ok: false, message: `Saisie invalide : le champ ${champ} doit être un nombre.` };
+  return { ok: false, message: textes().saisie.champ(champ) };
 }
 
 /**
@@ -137,11 +138,11 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
 
   const forme = valeurs.forme;
   if (!FORMES.includes(forme as FormePoteau)) {
-    return { ok: false, message: `Saisie invalide : forme de poteau inconnue « ${forme} ».` };
+    return { ok: false, message: textes().saisie.forme(forme) };
   }
   const position = valeurs.position;
   if (!POSITIONS.includes(position as PositionPoteau)) {
-    return { ok: false, message: `Saisie invalide : position de poteau inconnue « ${position} ».` };
+    return { ok: false, message: textes().saisie.position(position) };
   }
 
   const betaImpose = valeurs.beta_impose === 'oui';

@@ -11,22 +11,15 @@ import { nombreAffiche } from 'aedificium-ui';
 import type { ModeleSaisie } from './form';
 import type { BlocExport } from './export';
 import { avertissementPerimetre, lignesDuResultat, noteSurU0, titreDuVerdict } from './view';
+import { phrase, textes } from './textes';
 
 /** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
 const aff = (valeur: number, decimales: number): string =>
   nombreAffiche(valeur, Math.min(decimales, 3));
 
 /** Libelles des valeurs d'union, jamais affichees par leur cle. */
-const LIBELLES_FORME: Readonly<Record<ModeleSaisie['forme'], string>> = {
-  rectangulaire: 'rectangulaire',
-  circulaire: 'circulaire',
-};
-
-export const LIBELLES_POSITION: Readonly<Record<PositionPoteau, string>> = {
-  interieur: 'intérieur',
-  rive: 'rive',
-  angle: 'angle',
-};
+/** Libelle d'une position, jamais son identifiant. */
+export const libellePosition = (p: PositionPoteau): string => textes().sorties.positions[p];
 
 /** Tout ce qu'une sortie decrit : le modele, le calcul et les deux dessins. */
 export interface EtatExportable {
@@ -40,38 +33,39 @@ export interface EtatExportable {
 /** Les donnees d'entree, dans la meme forme que les resultats. */
 export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
   const m = sortie.modele;
+  const t = textes().sorties;
   const geometrie =
     m.forme === 'circulaire'
-      ? [{ symbole: 'D', libelle: 'diamètre du poteau', valeur: `${aff(m.D, 3)} mm` }]
+      ? [{ symbole: 'D', libelle: t.D, valeur: `${aff(m.D, 3)} mm` }]
       : [
-          { symbole: 'c1', libelle: 'côté perpendiculaire au bord libre', valeur: `${aff(m.c1, 3)} mm` },
-          { symbole: 'c2', libelle: 'côté parallèle au bord libre', valeur: `${aff(m.c2, 3)} mm` },
+          { symbole: 'c1', libelle: t.c1, valeur: `${aff(m.c1, 3)} mm` },
+          { symbole: 'c2', libelle: t.c2, valeur: `${aff(m.c2, 3)} mm` },
         ];
 
   return [
     {
-      titre: 'Dalle',
+      titre: t.dalle,
       lignes: [
-        { symbole: 'd_y', libelle: 'hauteur utile, direction y', valeur: `${aff(m.d_y, 3)} mm` },
-        { symbole: 'd_z', libelle: 'hauteur utile, direction z', valeur: `${aff(m.d_z, 3)} mm` },
-        { symbole: 'f_ck', libelle: 'résistance caractéristique du béton', valeur: `${aff(m.f_ck, 3)} MPa` },
-        { symbole: 'rho_ly', libelle: "taux d'armature longitudinale, direction y", valeur: aff(m.rho_ly, 3) },
-        { symbole: 'rho_lz', libelle: "taux d'armature longitudinale, direction z", valeur: aff(m.rho_lz, 3) },
+        { symbole: 'd_y', libelle: t.dy, valeur: `${aff(m.d_y, 3)} mm` },
+        { symbole: 'd_z', libelle: t.dz, valeur: `${aff(m.d_z, 3)} mm` },
+        { symbole: 'f_ck', libelle: t.fck, valeur: `${aff(m.f_ck, 3)} MPa` },
+        { symbole: 'rho_ly', libelle: t.rhoLy, valeur: aff(m.rho_ly, 3) },
+        { symbole: 'rho_lz', libelle: t.rhoLz, valeur: aff(m.rho_lz, 3) },
       ],
       note: null,
     },
     {
-      titre: 'Poteau',
+      titre: t.poteau,
       lignes: [
-        { symbole: 'forme', libelle: 'forme du poteau', valeur: LIBELLES_FORME[m.forme] },
+        { symbole: t.forme, libelle: t.formeLibelle, valeur: t.formes[m.forme] },
         ...geometrie,
-        { symbole: 'position', libelle: 'position dans la dalle', valeur: LIBELLES_POSITION[m.position] },
+        { symbole: t.position, libelle: t.positionLibelle, valeur: libellePosition(m.position) },
       ],
       note: null,
     },
     {
-      titre: 'Sollicitation',
-      lignes: [{ symbole: 'V_Ed', libelle: 'effort de poinçonnement', valeur: `${aff(m.V_Ed, 3)} kN` }],
+      titre: t.sollicitation,
+      lignes: [{ symbole: 'V_Ed', libelle: t.VEd, valeur: `${aff(m.V_Ed, 3)} kN` }],
       note: null,
     },
   ];
@@ -79,34 +73,30 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
 
 /** Les resultats, verdict compris. */
 export function blocsDeResultat(sortie: EtatExportable): BlocExport[] {
+  const t = textes().sorties;
   return [
     {
-      titre: 'Vérification (§6.4)',
+      titre: t.verification,
       lignes: lignesDuResultat(sortie.resultat),
       note: noteSurU0(sortie.donnees.poteau, sortie.resultat),
     },
     {
-      titre: 'Verdict',
+      titre: t.verdict,
       lignes: [
         {
-          symbole: 'constat',
-          libelle: 'verdict',
+          symbole: t.constat,
+          libelle: t.libelleVerdict,
           valeur: titreDuVerdict(sortie.resultat.verdict),
         },
       ],
-      note: sortie.resultat.motif,
+      note: phrase(sortie.resultat.motif),
     },
   ];
 }
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
-export const HYPOTHESES: readonly string[] = [
-  "Dalle pleine d'épaisseur constante : ni chapiteau, ni dalle allégée, ni précontrainte.",
-  'Coefficient beta par valeurs simplifiées du §6.4.3(6) ou imposé ; pas de calcul par W1.',
-  'Aucune ouverture à proximité du poteau (§6.4.2(3)).',
-  'Dispositions constructives des armatures de poinçonnement (§9.4.3) non vérifiées.',
-  "Valeurs recommandées de l'EN 1992-1-1 ; une annexe nationale peut les modifier.",
-];
+/** Hypotheses, en francais (tests) ; la note lit `textes().sorties.hypotheses`. */
+export const HYPOTHESES: readonly string[] = textes().sorties.hypotheses;
 
 /** Les mises en garde a placer en evidence dans la note. */
 export function avertissementsDeLaNote(sortie: EtatExportable): string[] {

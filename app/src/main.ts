@@ -8,7 +8,7 @@
  * calcul echoue.
  */
 
-import { blocsEnTexte, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
+import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { schemaDesPositions } from './beta-diagram';
 import {
@@ -31,7 +31,10 @@ import {
 } from './sorties';
 import { noteDuCalcul } from './note';
 import { ouvrirOuTelecharger, telecharger } from './storage';
+import { textes } from './textes';
 import './style.css';
+
+definirLangue(langueDuDocument(document));
 
 /** Element attendu de la page ; son absence est une erreur de developpement. */
 function exige<T extends Element>(selecteur: string): T {
@@ -206,10 +209,7 @@ function dateDuJour(): string {
 }
 
 function sansCalculAExporter(): void {
-  afficherErreur(
-    'Aucun calcul valide à exporter. Les sorties décrivent le dernier calcul réussi : ' +
-      'corriger la saisie, puis réessayer.'
-  );
+  afficherErreur(textes().messages.rienAExporter);
 }
 
 /**

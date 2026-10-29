@@ -21,6 +21,7 @@
 
 import { coefficientBetaSimplifie, type PositionPoteau } from '../../src/index';
 import { notationSvg, nombreAffiche } from 'aedificium-ui';
+import { textes } from './textes';
 
 /** Repere du dessin, en unites de viewBox. */
 const LARGEUR = 640;
@@ -132,7 +133,7 @@ function groupeDuCas(cas: Cas, courante: PositionPoteau): string {
     `<rect data-role="poteau" class="poteau" x="${cas.poteau.x}" y="${cas.poteau.y}"`,
     ` width="${COTE}" height="${COTE}" />`,
     `<text data-role="nom" class="nom" x="${cas.etiquette.x}" y="${cas.etiquette.y}">`,
-    `${notationSvg(cas.nom)}</text>`,
+    `${notationSvg(textes().positions.noms[cas.position])}</text>`,
     `<text data-role="beta" class="beta" x="${cas.etiquette.x}" y="${cas.etiquette.y + 22}">`,
     `${notationSvg(`beta = ${beta}`)}</text>`,
     '</g>',
@@ -145,12 +146,6 @@ function groupeDuCas(cas: Cas, courante: PositionPoteau): string {
  * Elles sont ECRITES SOUS LE SCHEMA, et non renvoyees a une documentation : un
  * utilisateur qui prend 1,15 hors de ces conditions se trompe en silence.
  */
-const CONDITIONS = [
-  "§6.4.3(6) — ces trois valeurs ne valent que si la stabilite laterale de la structure",
-  "ne depend pas d'un effet de cadre entre dalles et poteaux, ET si les portees adjacentes",
-  "ne different pas de plus de 25 %. Hors de ces conditions, β se calcule par W1",
-  '(§6.4.3(3) a (5)), calcul hors du domaine de cet outil : imposez alors votre valeur.',
-];
 
 /**
  * Vue en plan d'un coin de dalle portant les trois positions de poteau, chacune
@@ -161,7 +156,7 @@ const CONDITIONS = [
 export function schemaDesPositions(courante: PositionPoteau): string {
   const cas = casDeFigure().map((un) => groupeDuCas(un, courante));
 
-  const conditions = CONDITIONS.map(
+  const conditions = textes().positions.conditions.map(
     (ligne, index) =>
       `<text class="conditions" x="${BORD_GAUCHE}" y="${BORD_BAS + 34 + index * 17}">` +
       `${notationSvg(ligne)}</text>`,
@@ -169,14 +164,14 @@ export function schemaDesPositions(courante: PositionPoteau): string {
 
   return [
     `<svg viewBox="0 0 ${LARGEUR} ${HAUTEUR}" class="schema-positions" role="img"`,
-    ' aria-label="Les trois positions de poteau et leur coefficient beta simplifié">',
+    ` aria-label="${textes().positions.aria}">`,
     '<g class="dalle">',
     `<rect class="dalle-fond" x="${BORD_GAUCHE}" y="${BORD_HAUT}"`,
     ` width="${BORD_DROIT - BORD_GAUCHE}" height="${BORD_BAS - BORD_HAUT}" />`,
     `<path class="bord-libre" d="M ${BORD_GAUCHE} ${BORD_HAUT} V ${BORD_BAS}`,
     ` H ${BORD_DROIT}" />`,
     `<text class="bord-libre-nom" x="${BORD_GAUCHE + 6}" y="${BORD_HAUT + 18}">`,
-    `${notationSvg('bords libres de la dalle')}</text>`,
+    `${notationSvg(textes().positions.bords)}</text>`,
     '</g>',
     ...cas,
     conditions,

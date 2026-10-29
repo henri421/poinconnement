@@ -17,6 +17,7 @@ import {
 
 export { echapper, nombreFr } from 'aedificium-ui';
 import { nombreAffiche, notationHtml } from 'aedificium-ui';
+import { phrase, textes } from './textes';
 
 /** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
 const aff = (valeur: number, decimales: number): string =>
@@ -45,14 +46,7 @@ export function avertissementPerimetre(position: PositionPoteau): string | null 
   if (position === 'interieur') {
     return null;
   }
-  const nom = position === 'rive' ? 'de rive' : "d'angle";
-  return (
-    `Poteau ${nom} : le périmètre de contrôle retenu ici est l'offset à 2d, écrêté au bord ` +
-    "libre. L'EN 1992-1-1 prévoit, pour cette position, de retenir un périmètre PLUS COURT " +
-    "lorsque sa figure en donne un ; cette disposition n'est pas implémentée. Ne pas " +
-    "l'appliquer surestime u1, donc sous-estime v_Ed : le résultat ci-dessous peut être " +
-    'NON CONSERVATIF. À vérifier à la main, en particulier sur un poteau allongé.'
-  );
+  return textes().avertissementPerimetre(position);
 }
 
 /**
@@ -62,14 +56,7 @@ export function avertissementPerimetre(position: PositionPoteau): string | null 
  * « il manque des armatures », puisque aucune armature n'y remedie.
  */
 export function titreDuVerdict(verdict: Verdict): string {
-  switch (verdict) {
-    case 'aucune-armature-requise':
-      return 'Aucune armature de poinçonnement requise';
-    case 'dalle-trop-mince':
-      return 'Dalle trop mince : écrasement du béton au nu du poteau';
-    case 'armatures-necessaires':
-      return 'Armatures de poinçonnement à prévoir';
-  }
+  return textes().verdicts[verdict];
 }
 
 /** Classe du verdict, pour que les trois se distinguent aussi a l'oeil. */
@@ -86,27 +73,28 @@ export function classeDuVerdict(verdict: Verdict): string {
 
 /** Toutes les grandeurs du calcul, dans l'ordre ou on les relit. */
 export function lignesDuResultat(resultat: ResultatPoinconnement): LigneResultat[] {
+  const g = textes().grandeurs;
   const lignes: LigneResultat[] = [
-    { symbole: 'd', libelle: 'hauteur utile moyenne (d_y + d_z)/2', valeur: `${aff(resultat.d, 1)} mm` },
-    { symbole: 'β', libelle: "coefficient d'excentrement", valeur: aff(resultat.beta, 3) },
-    { symbole: 'u0', libelle: 'périmètre au nu du poteau', valeur: `${aff(resultat.u0, 0)} mm` },
-    { symbole: 'u1', libelle: 'périmètre de contrôle de base, à 2d', valeur: `${aff(resultat.u1, 0)} mm` },
-    { symbole: 'v_Ed(u0)', libelle: 'contrainte sollicitante au nu', valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
-    { symbole: 'v_Ed(u1)', libelle: 'contrainte sollicitante sur u1', valeur: `${aff(resultat.v_Ed_u1, 3)} MPa` },
-    { symbole: 'v_Rd,c', libelle: 'résistance sans armatures, eq. (6.47)', valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
-    { symbole: 'v_Rd,max', libelle: 'écrasement admissible au nu du poteau, §6.4.5(3)', valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
+    { symbole: 'd', libelle: g.d, valeur: `${aff(resultat.d, 1)} mm` },
+    { symbole: 'β', libelle: g.beta, valeur: aff(resultat.beta, 3) },
+    { symbole: 'u0', libelle: g.u0, valeur: `${aff(resultat.u0, 0)} mm` },
+    { symbole: 'u1', libelle: g.u1, valeur: `${aff(resultat.u1, 0)} mm` },
+    { symbole: 'v_Ed(u0)', libelle: g.vEdU0, valeur: `${aff(resultat.v_Ed_u0, 3)} MPa` },
+    { symbole: 'v_Ed(u1)', libelle: g.vEdU1, valeur: `${aff(resultat.v_Ed_u1, 3)} MPa` },
+    { symbole: 'v_Rd,c', libelle: g.vRdc, valeur: `${aff(resultat.v_Rd_c, 3)} MPa` },
+    { symbole: 'v_Rd,max', libelle: g.vRdmax, valeur: `${aff(resultat.v_Rd_max, 3)} MPa` },
   ];
 
   if (resultat.A_sw_requis !== undefined) {
     lignes.push({
       symbole: 'A_sw',
-      libelle: "aire d'armatures par cours satisfaisant l'eq. (6.52)",      valeur: `${aff(resultat.A_sw_requis, 0)} mm2`,
+      libelle: g.Asw,      valeur: `${aff(resultat.A_sw_requis, 0)} mm2`,
     });
   }
   if (resultat.u_out_ef !== undefined) {
     lignes.push({
       symbole: 'u_out,ef',
-      libelle: 'périmètre au-delà duquel les armatures sont inutiles',
+      libelle: g.uOut,
       valeur: `${aff(resultat.u_out_ef, 0)} mm`,
     });
   }
@@ -130,20 +118,16 @@ export function noteSurU0(poteau: Poteau, resultat: ResultatPoinconnement): stri
   if (resultat.u0 >= contourDessine - 1e-9) {
     return null;
   }
-  return (
-    `u0 retenu = ${aff(resultat.u0, 0)} mm : c'est la valeur du §6.4.5(3), plus courte ` +
-    `que le contour du poteau en contact avec la dalle (${aff(contourDessine, 0)} mm) ` +
-    'que montre le tracé. Le calcul retient la plus petite des deux.'
-  );
+  return textes().noteU0(aff(resultat.u0, 0), aff(contourDessine, 0));
 }
 
 /** Message d'erreur lisible, quelle que soit la nature de ce qui a ete leve. */
 export function messageDErreur(erreur: unknown): string {
   const detail =
     erreur instanceof Error && erreur.message !== ''
-      ? erreur.message
-      : 'cause inconnue. Vérifiez les valeurs saisies.';
-  return `Calcul impossible : ${detail}`;
+      ? phrase(erreur.message)
+      : textes().causeInconnue;
+  return textes().calculImpossible(detail);
 }
 
 // ---------------------------------------------------------------------------
@@ -166,7 +150,7 @@ type Forme =
 /** Cote strictement positif, ou refus : un trace sur une cote nulle n'a aucun sens. */
 function coteValide(valeur: number | undefined, nom: string): number {
   if (valeur === undefined || !Number.isFinite(valeur) || valeur <= 0) {
-    throw new Error(`Le tracé demande ${nom} strictement positif (mm).`);
+    throw new Error(textes().trace.cote(nom));
   }
   return valeur;
 }
@@ -335,7 +319,7 @@ function bordsLibres(position: PositionPoteau, dalle: Boite): string[] {
  */
 export function schemaDuPoteau(poteau: Poteau, d: number): string {
   if (!Number.isFinite(d) || d <= 0) {
-    throw new Error('Le tracé demande une hauteur utile d strictement positive (mm).');
+    throw new Error(textes().trace.hauteur);
   }
   const forme = formeDuPoteau(poteau);
   const a = 2 * d;
@@ -362,7 +346,7 @@ export function schemaDuPoteau(poteau: Poteau, d: number): string {
   return [
     `<svg viewBox="${co(vue.xMin)} ${co(-vue.yMax)} ${co(vue.xMax - vue.xMin)} `,
     `${co(vue.yMax - vue.yMin)}" class="schema-poteau" role="img"`,
-    ' aria-label="Tracé en plan du poteau et de ses périmètres de contrôle">',
+    ` aria-label="${textes().trace.aria}">`,
     `<defs><clipPath id="dalle-utile"><rect ${rectangleDalle} /></clipPath></defs>`,
     `<rect data-role="dalle" class="dalle" ${rectangleDalle} />`,
     elementDuContour(forme, a, 'perimetre-u1', 'perimetre-u1'),
@@ -403,7 +387,7 @@ export function rendreResultat(resultat: ResultatPoinconnement, poteau: Poteau):
     `<p data-role="verdict" data-verdict="${resultat.verdict}"`,
     ` class="verdict ${classeDuVerdict(resultat.verdict)}">`,
     `${notationHtml(titreDuVerdict(resultat.verdict))}</p>`,
-    `<p data-role="motif" class="motif">${notationHtml(resultat.motif)}</p>`,
+    `<p data-role="motif" class="motif">${notationHtml(phrase(resultat.motif))}</p>`,
     avertissement === null
       ? ''
       : `<p data-role="avertissement-perimetre" class="alerte">${notationHtml(avertissement)}</p>`,
