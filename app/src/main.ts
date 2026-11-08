@@ -8,6 +8,7 @@
  * calcul echoue.
  */
 
+import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
 import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { schemaDesPositions } from './beta-diagram';
@@ -165,7 +166,11 @@ function effacerErreur(): void {
  * et un resultat perime affiche sous une erreur bien visible vaut mieux qu'un
  * ecran blanc dont on ne sait pas s'il calcule encore.
  */
+/** Feuilles de calcul d'un projet de la suite. */
+let barre: BarreFeuilles | null = null;
+
 function rafraichir(): void {
+  barre?.signaler();
   const lecture = modeleDepuisChamps(valeursDesChamps());
   if (!lecture.ok) {
     afficherErreur(lecture.message);
@@ -273,6 +278,26 @@ const cartouche = lireCartouche();
 champProjet.value = cartouche.projet;
 champElement.value = cartouche.element;
 sectionSorties.addEventListener('input', enregistrerCartouche);
+
+barre = brancherFeuilles({
+  app: 'poinconnement',
+  nomApp: document.querySelector('header h1')?.textContent ?? 'poinconnement',
+  conteneur: document.querySelector('[data-role="feuilles"]') as HTMLElement,
+  lire: () => valeursDesChamps() as Json,
+  charger: (d) => {
+    if (d === null) ecrireModele(modeleParDefaut());
+    else {
+      const v = d as Record<string, string>;
+      for (const el of champs()) {
+        const valeur = v[el.getAttribute('data-champ') ?? ''];
+        if (valeur === undefined) continue;
+        if (el instanceof HTMLInputElement && el.type === 'checkbox') el.checked = valeur === 'oui';
+        else el.value = valeur;
+      }
+    }
+    rafraichir();
+  },
+});
 
 rafraichir();
 

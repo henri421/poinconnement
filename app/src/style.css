@@ -57,6 +57,7 @@ body {
 }
 
 header,
+.feuilles,
 main,
 footer {
   max-width: 68rem;
@@ -509,4 +510,12 @@ footer {
   body {
     background: var(--surface);
   }
+}
+
+/* Barre des feuilles de calcul (projets de la suite). */
+.feuilles {
+  margin-top: 0.8rem;
+}
+.feuilles:empty {
+  display: none;
 }
