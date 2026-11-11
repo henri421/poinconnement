@@ -10,6 +10,7 @@ import type { ResultatPoinconnement } from '../../src/index';
 import { avertissementsDeLaNote, blocsDEntree, type EtatExportable } from './sorties';
 import { lignesDuResultat, noteSurU0 } from './view';
 import { phrase, textes } from './textes';
+import { VERSION_OUTIL } from './version';
 
 const aff = (v: number, d = 3): string => nombreAffiche(v, Math.min(d, 3));
 const L = (symbole: string, libelle: string, valeur: string): LigneResultat => ({ symbole, libelle, valeur });
@@ -43,6 +44,7 @@ export function noteDuCalcul(e: EtatExportable, cartouche: { projet: string; ele
 
   return {
     cartouche: {
+      version: VERSION_OUTIL,
       projet: cartouche.projet,
       element: cartouche.element.trim() === '' ? nomDeLElement(e) : cartouche.element,
       date: cartouche.date,

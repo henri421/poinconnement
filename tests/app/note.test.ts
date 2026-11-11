@@ -15,6 +15,7 @@ import { schemaDesPositions } from '../../app/src/beta-diagram';
 import { STYLES_TRACE } from '../../app/src/export';
 import { HYPOTHESES, avertissementsDeLaNote, type EtatExportable } from '../../app/src/sorties';
 import { noteDuCalcul } from '../../app/src/note';
+import { VERSION_OUTIL } from '../../app/src/version';
 
 const lire = (chemin: string): string => readFileSync(fileURLToPath(new URL(chemin, import.meta.url)), 'utf8');
 const CARTOUCHE = { projet: 'Bureaux', element: 'Poteau B4', date: '2026-10-28' };
@@ -41,7 +42,7 @@ const figures = (els: ElementNote[] | undefined) => (els ?? []).flatMap((e) => (
 
 describe('cartouche', () => {
   it('projet, element, date, norme et outil', () => {
-    expect(note.cartouche).toEqual({ ...CARTOUCHE, norme: 'EN 1992-1-1:2004, §6.4', outil: 'poinçonnement' });
+    expect(note.cartouche).toEqual({ ...CARTOUCHE, version: VERSION_OUTIL, norme: 'EN 1992-1-1:2004, §6.4', outil: 'poinçonnement' });
   });
 
   it('element vide : poteau et sa position', () => {
