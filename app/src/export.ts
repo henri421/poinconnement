@@ -108,6 +108,11 @@ svg {
 .schema-poteau .dalle { fill: var(--beton); }
 .schema-poteau .poteau { fill: var(--texte); }
 .schema-poteau .perimetre-u0 { fill: none; stroke: var(--accent); stroke-width: 3; }
+.schema-poteau .barre-y { stroke: var(--traction); stroke-width: 1.5; opacity: 0.7; }
+.schema-poteau .barre-z { stroke: var(--compression); stroke-width: 1.5; opacity: 0.6; }
+.schema-poteau .bande-rho { fill: none; stroke: var(--neutre); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.schema-poteau .cours { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.schema-poteau .perimetre-uout { fill: none; stroke: var(--texte-doux); stroke-width: 2; stroke-dasharray: 10 4 2 4; }
 .schema-poteau .perimetre-u1 {
   fill: none;
   stroke: var(--accent);

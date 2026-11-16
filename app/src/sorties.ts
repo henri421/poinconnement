@@ -17,6 +17,10 @@ import { phrase, textes } from './textes';
 const aff = (valeur: number, decimales: number): string =>
   nombreAffiche(valeur, Math.min(decimales, 3));
 
+/** Nappe reguliere : « φ16 e = 150 mm, 1 340 mm²/m ». */
+const barres = (phi: number, s: number): string =>
+  `φ${aff(phi, 1)} e = ${aff(s, 1)} mm, ${aff((Math.PI * phi * phi) / 4 * (1000 / s), 0)} mm²/m`;
+
 /** Libelles des valeurs d'union, jamais affichees par leur cle. */
 /** Libelle d'une position, jamais son identifiant. */
 export const libellePosition = (p: PositionPoteau): string => textes().sorties.positions[p];
@@ -49,8 +53,14 @@ export function blocsDEntree(sortie: EtatExportable): BlocExport[] {
         { symbole: 'd_y', libelle: t.dy, valeur: `${aff(m.d_y, 3)} mm` },
         { symbole: 'd_z', libelle: t.dz, valeur: `${aff(m.d_z, 3)} mm` },
         { symbole: 'f_ck', libelle: t.fck, valeur: `${aff(m.f_ck, 3)} MPa` },
-        { symbole: 'rho_ly', libelle: t.rhoLy, valeur: aff(m.rho_ly, 3) },
-        { symbole: 'rho_lz', libelle: t.rhoLz, valeur: aff(m.rho_lz, 3) },
+        ...(m.saisieAciers === 'barres'
+          ? [
+              { symbole: 'A_s,y', libelle: t.aciersY, valeur: barres(m.phi_y, m.s_y) },
+              { symbole: 'A_s,z', libelle: t.aciersZ, valeur: barres(m.phi_z, m.s_z) },
+            ]
+          : []),
+        { symbole: 'rho_ly', libelle: t.rhoLy, valeur: aff(m.rho_ly, 5) },
+        { symbole: 'rho_lz', libelle: t.rhoLz, valeur: aff(m.rho_lz, 5) },
       ],
       note: null,
     },

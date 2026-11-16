@@ -50,12 +50,35 @@
             <label><span>f<sub>ck</sub> (MPa)</span>
               <input type="text" inputmode="decimal" data-champ="f_ck" />
             </label>
+            <label><span>Armatures tendues</span>
+              <select data-champ="saisie_aciers">
+                <option value="taux">taux ρl</option>
+                <option value="barres">barres et espacement</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="aciers-taux">
             <label><span>&rho;<sub>ly</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_ly" />
             </label>
             <label><span>&rho;<sub>lz</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_lz" />
             </label>
+            </div>
+            <div class="groupe" data-groupe="aciers-barres">
+              <label><span>&phi;<sub>y</sub> (mm), barres de la direction y</span>
+                <input type="text" inputmode="decimal" data-champ="phi_y" />
+              </label>
+              <label><span>s<sub>y</sub> (mm), espacement</span>
+                <input type="text" inputmode="decimal" data-champ="s_y" />
+              </label>
+              <label><span>&phi;<sub>z</sub> (mm), barres de la direction z</span>
+                <input type="text" inputmode="decimal" data-champ="phi_z" />
+              </label>
+              <label><span>s<sub>z</sub> (mm), espacement</span>
+                <input type="text" inputmode="decimal" data-champ="s_z" />
+              </label>
+              <p class="legende" data-role="rho-calcule"></p>
+            </div>
           </fieldset>
 
           <fieldset>
@@ -146,7 +169,10 @@
         <p class="legende">
           Trait plein : le poteau. Trait fort : le périmètre au nu u<sub>0</sub>.
           Pointillés : le périmètre de contrôle u<sub>1</sub>, à 2d,
-          écrêté aux bords libres (trait épais).
+          écrêté aux bords libres (trait épais). Avec des barres saisies : barres de la
+          direction y (horizontales) et z (verticales), bande c + 3d où ρ<sub>l</sub> est défini
+          (tirets gris) ; avec des armatures de poinçonnement : cours à 0,5d puis s<sub>r</sub>
+          (pointillés fins) et périmètre u<sub>out,ef</sub> (trait mixte).
         </p>
       </section>
 

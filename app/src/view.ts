@@ -317,14 +317,56 @@ function bordsLibres(position: PositionPoteau, dalle: Boite): string[] {
  * millimetres, ou une police n'aurait pas de taille lisible. Les valeurs se
  * lisent dans le tableau qui l'accompagne.
  */
-export function schemaDuPoteau(poteau: Poteau, d: number): string {
+/** Ce que la vue en plan peut ajouter aux perimetres (audit U2). */
+export interface OptionsSchema {
+  /** Nappes tendues saisies par barres : diametres et espacements (mm). */
+  nappes?: { phi_y: number; s_y: number; phi_z: number; s_z: number };
+  /** Cours d'armatures de poinconnement et perimetre u_out,ef (mm). */
+  cours?: { s_r: number; u_out_ef?: number };
+}
+
+/** Distance au nu du contour de longueur `u`, par dichotomie sur le perimetre du noyau. */
+function distanceDuPerimetre(poteau: Poteau, u: number): number | null {
+  if (!(u > perimetreDeControle(poteau, 0))) return null;
+  let bas = 0;
+  let haut = 1;
+  while (perimetreDeControle(poteau, haut) < u) {
+    haut *= 2;
+    if (haut > 1e7) return null;
+  }
+  for (let i = 0; i < 60; i++) {
+    const milieu = (bas + haut) / 2;
+    if (perimetreDeControle(poteau, milieu) < u) bas = milieu;
+    else haut = milieu;
+  }
+  return (bas + haut) / 2;
+}
+
+/**
+ * Distances au nu des cours d'armatures de poinconnement : le premier a 0,5d,
+ * puis tous les s_r, le dernier a au plus 1,5d en deca de u_out,ef
+ * (EN 1992-1-1 6.4.5(4), figure 9.10). Sans u_out,ef, jusqu'a u_1 (2d).
+ */
+export function distancesDesCours(d: number, s_r: number, aOut: number | null): number[] {
+  if (!(s_r > 0)) return [];
+  const limite = aOut === null ? 2 * d : aOut - 1.5 * d;
+  const cours: number[] = [];
+  for (let a = 0.5 * d; a <= limite + 1e-9 && cours.length < 50; a += s_r) cours.push(a);
+  return cours;
+}
+
+export function schemaDuPoteau(poteau: Poteau, d: number, options: OptionsSchema = {}): string {
   if (!Number.isFinite(d) || d <= 0) {
     throw new Error(textes().trace.hauteur);
   }
   const forme = formeDuPoteau(poteau);
   const a = 2 * d;
 
-  const contour = boiteDilatee(forme, a);
+  const aOut = options.cours?.u_out_ef === undefined ? null : distanceDuPerimetre(poteau, options.cours.u_out_ef);
+  const cours = options.cours === undefined ? [] : distancesDesCours(d, options.cours.s_r, aOut);
+  const portee = Math.max(a, options.nappes ? 3 * d : 0, aOut ?? 0, ...cours);
+
+  const contour = boiteDilatee(forme, portee);
   const marge = 0.08 * Math.max(contour.xMax - contour.xMin, contour.yMax - contour.yMin);
   // Au-dela d'un bord libre il n'y a pas de dalle, et le contour y est ecrete :
   // etendre la vue de ce cote ne montrerait qu'un vide, et retrecirait d'autant
@@ -349,12 +391,47 @@ export function schemaDuPoteau(poteau: Poteau, d: number): string {
     ` aria-label="${textes().trace.aria}">`,
     `<defs><clipPath id="dalle-utile"><rect ${rectangleDalle} /></clipPath></defs>`,
     `<rect data-role="dalle" class="dalle" ${rectangleDalle} />`,
+    ...nappesEnPlan(forme, d, dalle, options.nappes),
+    ...cours.map((c) => elementDuContour(forme, c, 'cours', 'cours')),
+    ...(aOut === null ? [] : [elementDuContour(forme, aOut, 'perimetre-uout', 'perimetre-uout')]),
     elementDuContour(forme, a, 'perimetre-u1', 'perimetre-u1'),
     elementDuContour(forme, 0, 'perimetre-u0', 'perimetre-u0'),
     elementDuPoteau(forme),
     ...bordsLibres(poteau.position, dalle),
     '</svg>',
   ].join('');
+}
+
+/**
+ * Barres des deux nappes tendues, regulieres sur toute la vue, et la bande
+ * c + 3d de part et d'autre du poteau sur laquelle rho_l est defini (6.4.4(1)).
+ * Barres de la direction y tracees horizontalement, de la direction z
+ * verticalement ; l'axe de chaque nappe passe par le centre du poteau.
+ */
+function nappesEnPlan(forme: Forme, d: number, dalle: Boite, nappes: OptionsSchema['nappes']): string[] {
+  if (nappes === undefined) return [];
+  const centre = forme.type === 'rectangle'
+    ? { x: (forme.boite.xMin + forme.boite.xMax) / 2, y: (forme.boite.yMin + forme.boite.yMax) / 2 }
+    : { x: forme.cx, y: forme.cy };
+  const sortie: string[] = [];
+  const bande = boiteDilatee(forme, 3 * d);
+  sortie.push(
+    `<rect data-role="bande-rho" class="bande-rho" clip-path="url(#dalle-utile)" x="${co(bande.xMin)}" y="${co(-bande.yMax)}" ` +
+      `width="${co(bande.xMax - bande.xMin)}" height="${co(bande.yMax - bande.yMin)}" />`
+  );
+  const positions = (debut: number, fin: number, origine: number, pas: number): number[] => {
+    const liste: number[] = [];
+    if (!(pas > 0)) return liste;
+    for (let v = origine - Math.floor((origine - debut) / pas) * pas; v <= fin && liste.length < 400; v += pas) liste.push(v);
+    return liste;
+  };
+  for (const y of positions(dalle.yMin, dalle.yMax, centre.y, nappes.s_y)) {
+    sortie.push(`<line data-role="barre-y" class="barre-y" x1="${co(dalle.xMin)}" x2="${co(dalle.xMax)}" y1="${co(-y)}" y2="${co(-y)}" />`);
+  }
+  for (const x of positions(dalle.xMin, dalle.xMax, centre.x, nappes.s_z)) {
+    sortie.push(`<line data-role="barre-z" class="barre-z" x1="${co(x)}" x2="${co(x)}" y1="${co(-dalle.yMax)}" y2="${co(-dalle.yMin)}" />`);
+  }
+  return sortie;
 }
 
 // ---------------------------------------------------------------------------

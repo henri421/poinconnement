@@ -49,12 +49,35 @@
             <label><span>f<sub>ck</sub> (MPa)</span>
               <input type="text" inputmode="decimal" data-champ="f_ck" />
             </label>
+            <label><span>Tension reinforcement</span>
+              <select data-champ="saisie_aciers">
+                <option value="taux">ratio ρl</option>
+                <option value="barres">bars and spacing</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="aciers-taux">
             <label><span>&rho;<sub>ly</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_ly" />
             </label>
             <label><span>&rho;<sub>lz</sub> (-)</span>
               <input type="text" inputmode="decimal" data-champ="rho_lz" />
             </label>
+            </div>
+            <div class="groupe" data-groupe="aciers-barres">
+              <label><span>&phi;<sub>y</sub> (mm), bars in direction y</span>
+                <input type="text" inputmode="decimal" data-champ="phi_y" />
+              </label>
+              <label><span>s<sub>y</sub> (mm), spacing</span>
+                <input type="text" inputmode="decimal" data-champ="s_y" />
+              </label>
+              <label><span>&phi;<sub>z</sub> (mm), bars in direction z</span>
+                <input type="text" inputmode="decimal" data-champ="phi_z" />
+              </label>
+              <label><span>s<sub>z</sub> (mm), spacing</span>
+                <input type="text" inputmode="decimal" data-champ="s_z" />
+              </label>
+              <p class="legende" data-role="rho-calcule"></p>
+            </div>
           </fieldset>
 
           <fieldset>
@@ -145,7 +168,10 @@
         <p class="legende">
           Solid line: the column. Heavy line: the perimeter at the face u<sub>0</sub>.
           Dashed line: the control perimeter u<sub>1</sub>, at 2d,
-          cut at the free edges (thick line).
+          cut at the free edges (thick line). With bars entered: bars in direction y
+          (horizontal) and z (vertical), band c + 3d where ρ<sub>l</sub> is defined
+          (grey dashes); with punching reinforcement: perimeters at 0.5d then s<sub>r</sub>
+          (fine dots) and the u<sub>out,ef</sub> perimeter (dash-dot line).
         </p>
       </section>
 

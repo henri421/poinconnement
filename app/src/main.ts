@@ -9,6 +9,7 @@
  */
 
 import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
+import { nombreAffiche, notationHtml } from 'aedificium-ui';
 import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { schemaDesPositions } from './beta-diagram';
@@ -141,6 +142,8 @@ function ajusterLesGroupes(modele: ModeleSaisie): void {
     circulaire: modele.forme === 'circulaire',
     beta: modele.betaImpose,
     armatures: modele.armatures,
+    'aciers-taux': modele.saisieAciers === 'taux',
+    'aciers-barres': modele.saisieAciers === 'barres',
   };
   for (const [groupe, visible] of Object.entries(visibilites)) {
     exige<HTMLElement>(`[data-groupe="${groupe}"]`).hidden = !visible;
@@ -179,6 +182,16 @@ function rafraichir(): void {
 
   const modele = lecture.modele;
   ajusterLesGroupes(modele);
+  const rhoCalcule = document.querySelector<HTMLElement>('[data-role="rho-calcule"]');
+  if (rhoCalcule !== null) {
+    rhoCalcule.innerHTML =
+      modele.saisieAciers === 'barres'
+        ? notationHtml(
+            `rho_ly = ${nombreAffiche(modele.rho_ly, 5)} ; rho_lz = ${nombreAffiche(modele.rho_lz, 5)} ` +
+              `(A_s / (1000 d), ${textes().sorties.bande})`
+          )
+        : '';
+  }
   // Le schema des positions ne depend que de la position, deja validee : il
   // reste juste, meme quand le calcul qui suit echoue.
   corpsPositions.innerHTML = schemaDesPositions(modele.position);
@@ -186,8 +199,13 @@ function rafraichir(): void {
   try {
     const donnees = donneesDepuisModele(modele);
     const d = hauteurUtileMoyenne(donnees.d_y, donnees.d_z);
-    const schema = schemaDuPoteau(donnees.poteau, d);
     const resultat = verifierPoinconnement(donnees);
+    const schema = schemaDuPoteau(donnees.poteau, d, {
+      ...(modele.saisieAciers === 'barres'
+        ? { nappes: { phi_y: modele.phi_y, s_y: modele.s_y, phi_z: modele.phi_z, s_z: modele.s_z } }
+        : {}),
+      ...(modele.armatures ? { cours: { s_r: modele.s_r, u_out_ef: resultat.u_out_ef } } : {}),
+    });
 
     corpsSchema.innerHTML = schema;
     corpsResultat.innerHTML = rendreResultat(resultat, donnees.poteau);
