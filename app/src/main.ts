@@ -8,7 +8,8 @@
  * calcul echoue.
  */
 
-import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
+import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, type BarreFeuilles, type Json } from 'aedificium-ui';
+import { coefsDeLAnnexe } from './annexe';
 import { nombreAffiche, notationHtml } from 'aedificium-ui';
 import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
@@ -288,7 +289,30 @@ document.addEventListener('click', (evenement) => {
   else if (action === 'exporter-note') exporterNote(derniereSortie);
 });
 
+const selecteurAnnexe = formulaire.querySelector<HTMLSelectElement>('[data-role="annexe"]');
+const bandeauAnnexe = formulaire.querySelector<HTMLElement>('[data-role="bandeau-annexe"]');
+if (selecteurAnnexe !== null) selecteurAnnexe.innerHTML = optionsAnnexe('recommande');
+
+/** Bandeau de l'annexe luxembourgeoise, tant qu'elle n'est pas verifiee. */
+function majBandeauAnnexe(): void {
+  if (bandeauAnnexe === null || selecteurAnnexe === null) return;
+  bandeauAnnexe.textContent = avertissementAnnexeLu();
+  bandeauAnnexe.hidden = selecteurAnnexe.value !== 'lu' || bandeauAnnexe.textContent === '';
+}
+
 ecrireModele(modeleParDefaut());
+majBandeauAnnexe();
+// Changer d'annexe repremplit gamma_c et alpha_cc ; ils restent modifiables ensuite.
+formulaire.addEventListener('change', (ev) => {
+  if (ev.target !== selecteurAnnexe || selecteurAnnexe === null) return;
+  const c = coefsDeLAnnexe(lireAnnexe(selecteurAnnexe.value));
+  const v = champsDepuisModele({ ...modeleParDefaut(), gamma_c: c.gamma_c, alpha_cc: c.alpha_cc });
+  for (const cle of ['gamma_c', 'alpha_cc'] as const) {
+    const champ = formulaire.querySelector<HTMLInputElement>(`[data-champ="${cle}"]`);
+    if (champ !== null) champ.value = v[cle] ?? '';
+  }
+  majBandeauAnnexe();
+});
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
 
@@ -303,8 +327,9 @@ barre = brancherFeuilles({
   conteneur: document.querySelector('[data-role="feuilles"]') as HTMLElement,
   lire: () => valeursDesChamps() as Json,
   charger: (d) => {
-    if (d === null) ecrireModele(modeleParDefaut());
-    else {
+    // Une feuille enregistree avant le lot E n'a pas d'annexe : repartir des valeurs par defaut.
+    ecrireModele(modeleParDefaut());
+    if (d !== null) {
       const v = d as Record<string, string>;
       for (const el of champs()) {
         const valeur = v[el.getAttribute('data-champ') ?? ''];
@@ -314,6 +339,7 @@ barre = brancherFeuilles({
       }
     }
     rafraichir();
+    majBandeauAnnexe();
   },
 });
 

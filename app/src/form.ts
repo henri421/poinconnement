@@ -10,7 +10,7 @@
  * angle des armatures en DEGRES — plus naturel a saisir que des radians.
  */
 
-import { lireNombre } from 'aedificium-ui';
+import { lireAnnexe, lireNombre, type AnnexeNationale } from 'aedificium-ui';
 import type { DonneesPoinconnement, PositionPoteau } from '../../src/index';
 import { textes } from './textes';
 
@@ -66,6 +66,8 @@ export interface ModeleSaisie {
   gamma_c: number;
   /** Coefficient des effets a long terme (-). */
   alpha_cc: number;
+  /** Annexe nationale (lot E) : preremplit gamma_c et alpha_cc, qui restent modifiables. */
+  annexe: AnnexeNationale;
 }
 
 export type Lecture = { ok: true; modele: ModeleSaisie } | { ok: false; message: string };
@@ -105,6 +107,7 @@ export function modeleParDefaut(): ModeleSaisie {
     alpha: 90,
     gamma_c: 1.5,
     alpha_cc: 1,
+    annexe: 'recommande',
   };
 }
 
@@ -152,6 +155,7 @@ export function champsDepuisModele(modele: ModeleSaisie): Record<string, string>
     alpha: String(modele.alpha),
     gamma_c: String(modele.gamma_c),
     alpha_cc: String(modele.alpha_cc),
+    annexe: modele.annexe,
   };
 }
 
@@ -256,6 +260,7 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
       alpha: requis.alpha ?? facultatif('alpha', precedent.alpha),
       gamma_c: requis.gamma_c,
       alpha_cc: requis.alpha_cc,
+      annexe: lireAnnexe(valeurs.annexe),
     },
   };
 }

@@ -5,8 +5,9 @@
  * que le CSV : memes lignes que l'ecran, memes dessins, jamais redessines.
  */
 
-import { nombreAffiche, type ElementNote, type LigneResultat, type NoteDeCalcul, type VerificationNote } from 'aedificium-ui';
+import { avertissementAnnexeLu, libelleAnnexe, nombreAffiche, traduireSource, type ElementNote, type LigneResultat, type NoteDeCalcul, type VerificationNote } from 'aedificium-ui';
 import type { ResultatPoinconnement } from '../../src/index';
+import { sourceDuCoef } from './annexe';
 import { avertissementsDeLaNote, blocsDEntree, type EtatExportable } from './sorties';
 import { lignesDuResultat, noteSurU0 } from './view';
 import { phrase, textes } from './textes';
@@ -62,10 +63,11 @@ export function noteDuCalcul(e: EtatExportable, cartouche: { projet: string; ele
         { type: 'figure', svg: e.schema, legende: t.legendePerimetres },
       ],
       materiaux: [
+        { type: 'texte', texte: `${t.annexe} : ${libelleAnnexe(m.annexe)}.` },
         bloc(t.materiaux, [
           ligne('f_ck'),
-          L('gamma_c', t.gammaC, aff(m.gamma_c)),
-          L('alpha_cc', t.alphaCc, aff(m.alpha_cc)),
+          L('gamma_c', `${t.gammaC} (${traduireSource(sourceDuCoef(m.annexe, 'gamma_c', m.gamma_c))})`, aff(m.gamma_c)),
+          L('alpha_cc', `${t.alphaCc} (${traduireSource(sourceDuCoef(m.annexe, 'alpha_cc', m.alpha_cc))})`, aff(m.alpha_cc)),
           ligne('rho_ly'),
           ligne('rho_lz'),
           ...(m.armatures ? [L('f_ywd', t.fywd, `${aff(m.f_ywd)} MPa`)] : []),
@@ -84,6 +86,6 @@ export function noteDuCalcul(e: EtatExportable, cartouche: { projet: string; ele
       ],
     },
     verifications: verificationsDeLaNote(e.resultat),
-    avertissements: avertissementsDeLaNote(e),
+    avertissements: [...(m.annexe === 'lu' ? [avertissementAnnexeLu()].filter((a) => a !== '') : []), ...avertissementsDeLaNote(e)],
   };
 }
