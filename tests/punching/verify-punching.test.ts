@@ -12,7 +12,7 @@ import {
  * rho_l = 0,8 % dans les deux directions, beta simplifie.
  *
  * u1 = 2*(400+400) + 4*pi*250 = 4741,59 mm ; u0 = 1600 mm
- * v_Rd,c = 0,655737 MPa ; v_Rd,max = 5,28 MPa
+ * v_Rd,c = 0,655737 MPa ; v_Rd,max = 4,224 MPa (0,4 nu f_cd, AC:2010)
  */
 function dalleDeReference(V_Ed: number): DonneesPoinconnement {
   return {
@@ -50,7 +50,7 @@ describe('verifierPoinconnement — les trois verdicts', () => {
   });
 
   it('des armatures sont necessaires quand v_Rd,c est depasse sans ecrasement', () => {
-    // V_Ed = 900 kN : v_Ed(u1) = 0,873124 > 0,655737 ; v_Ed(u0) = 2,5875 <= 5,28
+    // V_Ed = 900 kN : v_Ed(u1) = 0,873124 > 0,655737 ; v_Ed(u0) = 2,5875 <= 4,224
     const resultat = verifierPoinconnement(dalleDeReference(900));
 
     expect(resultat.verdict).toBe('armatures-necessaires');
@@ -59,13 +59,18 @@ describe('verifierPoinconnement — les trois verdicts', () => {
   });
 
   it('la dalle est trop mince quand v_Ed(u0) depasse v_Rd,max', () => {
-    // V_Ed = 2500 kN : v_Ed(u0) = 7,1875 MPa > v_Rd,max = 5,28 MPa
+    // V_Ed = 2500 kN : v_Ed(u0) = 7,1875 MPa > v_Rd,max = 4,224 MPa
     const resultat = verifierPoinconnement(dalleDeReference(2500));
 
     expect(resultat.verdict).toBe('dalle-trop-mince');
     expect(resultat.motif).toMatch(/trop mince/i);
     expect(resultat.v_Ed_u0).toBeCloseTo(7.1875, 9);
-    expect(resultat.v_Rd_max).toBeCloseTo(5.28, 12);
+    expect(resultat.v_Rd_max).toBeCloseTo(4.224, 12);
+  });
+
+  it('v_Rd,max suit le coefficient k national quand il est fourni', () => {
+    const r = verifierPoinconnement({ ...dalleDeReference(900), k_vRd_max: 0.5 });
+    expect(r.v_Rd_max).toBeCloseTo(5.28, 12);
   });
 
   /**

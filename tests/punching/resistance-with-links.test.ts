@@ -8,21 +8,24 @@ import {
   type DonneesArmatures,
 } from '../../src/punching/resistance-with-links';
 
-describe('resistanceMaximale — v_Rd,max = 0,5 * nu * f_cd, §6.4.5(3)', () => {
+describe('resistanceMaximale — v_Rd,max = 0,4 * nu * f_cd, §6.4.5(3) et AC:2010', () => {
   it('cas calcule a la main', () => {
     // nu = 0,6 * (1 - 30/250) = 0,6 * 0,88 = 0,528
-    // f_cd = 30/1,5 = 20 MPa ; v_Rd,max = 0,5 * 0,528 * 20 = 5,28 MPa
-    expect(resistanceMaximale(30)).toBeCloseTo(5.28, 12);
+    // f_cd = 30/1,5 = 20 MPa ; v_Rd,max = 0,4 * 0,528 * 20 = 4,224 MPa
+    expect(resistanceMaximale(30)).toBeCloseTo(4.224, 12);
+    // k national different : 0,5 (texte de 2004 avant corrigendum) -> 5,28 MPa
+    expect(resistanceMaximale(30, 1.5, 1, 0.5)).toBeCloseTo(5.28, 12);
+    expect(() => resistanceMaximale(30, 1.5, 1, 0)).toThrow(/k de v_Rd,max/);
   });
 
   it('decroit en proportion de nu quand f_ck augmente', () => {
-    // nu = 0,6 * (1 - 50/250) = 0,48 ; f_cd = 50/1,5 ; v_Rd,max = 0,5*0,48*50/1,5 = 8 MPa
-    expect(resistanceMaximale(50)).toBeCloseTo(8, 12);
+    // nu = 0,6 * (1 - 50/250) = 0,48 ; f_cd = 50/1,5 ; v_Rd,max = 0,4*0,48*50/1,5 = 6,4 MPa
+    expect(resistanceMaximale(50)).toBeCloseTo(6.4, 12);
   });
 
   it('gamma_c peut etre impose', () => {
-    // f_cd = 30/1,2 = 25 MPa ; v_Rd,max = 0,5 * 0,528 * 25 = 6,6 MPa
-    expect(resistanceMaximale(30, 1.2)).toBeCloseTo(6.6, 12);
+    // f_cd = 30/1,2 = 25 MPa ; v_Rd,max = 0,4 * 0,528 * 25 = 5,28 MPa
+    expect(resistanceMaximale(30, 1.2)).toBeCloseTo(5.28, 12);
   });
 
   it('un f_ck nul ou negatif leve', () => {

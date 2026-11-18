@@ -68,6 +68,7 @@ export function noteDuCalcul(e: EtatExportable, cartouche: { projet: string; ele
           ligne('f_ck'),
           L('gamma_c', `${t.gammaC} (${traduireSource(sourceDuCoef(m.annexe, 'gamma_c', m.gamma_c))})`, aff(m.gamma_c)),
           L('alpha_cc', `${t.alphaCc} (${traduireSource(sourceDuCoef(m.annexe, 'alpha_cc', m.alpha_cc))})`, aff(m.alpha_cc)),
+          L('k_vRd_max', `${t.kVRdMax} (${traduireSource(sourceDuCoef(m.annexe, 'k_vRd_max', m.k_vRd_max))})`, aff(m.k_vRd_max)),
           ligne('rho_ly'),
           ligne('rho_lz'),
           ...(m.armatures ? [L('f_ywd', t.fywd, `${aff(m.f_ywd)} MPa`)] : []),

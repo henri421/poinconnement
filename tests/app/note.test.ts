@@ -82,7 +82,7 @@ describe('sections', () => {
   });
 
   it('materiaux : beton, coefficients, armatures longitudinales', () => {
-    expect(symboles(note.sections.materiaux)).toEqual(['f_ck', 'gamma_c', 'alpha_cc', 'rho_ly', 'rho_lz', 'f_ywd']);
+    expect(symboles(note.sections.materiaux)).toEqual(['f_ck', 'gamma_c', 'alpha_cc', 'k_vRd_max', 'rho_ly', 'rho_lz', 'f_ywd']);
   });
 
   it('hypotheses : beta retenu, puis la liste', () => {

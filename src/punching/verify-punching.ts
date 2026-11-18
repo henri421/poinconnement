@@ -51,6 +51,8 @@ export interface DonneesPoinconnement {
   gamma_c?: number;
   /** Coefficient des effets a long terme ; 1,0 par defaut. */
   alpha_cc?: number;
+  /** k de v_Rd,max = k nu f_cd, §6.4.5(3) ; 0,4 (valeur recommandee) par defaut. */
+  k_vRd_max?: number;
   /** Contrainte normale du beton, direction y (MPa, compression positive). */
   sigma_cy?: number;
   /** Contrainte normale du beton, direction z (MPa, compression positive). */
@@ -157,7 +159,7 @@ export function verifierPoinconnement(donnees: DonneesPoinconnement): ResultatPo
     sigma_cy: donnees.sigma_cy,
     sigma_cz: donnees.sigma_cz,
   });
-  const v_Rd_max = resistanceMaximale(donnees.f_ck, donnees.gamma_c, donnees.alpha_cc);
+  const v_Rd_max = resistanceMaximale(donnees.f_ck, donnees.gamma_c, donnees.alpha_cc, donnees.k_vRd_max);
 
   const commun = { d, beta, u0, u1, v_Ed_u0, v_Ed_u1, v_Rd_c, v_Rd_max };
 

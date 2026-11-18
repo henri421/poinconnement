@@ -302,12 +302,12 @@ function majBandeauAnnexe(): void {
 
 ecrireModele(modeleParDefaut());
 majBandeauAnnexe();
-// Changer d'annexe repremplit gamma_c et alpha_cc ; ils restent modifiables ensuite.
+// Changer d'annexe repremplit gamma_c, alpha_cc et k de v_Rd,max ; ils restent modifiables ensuite.
 formulaire.addEventListener('change', (ev) => {
   if (ev.target !== selecteurAnnexe || selecteurAnnexe === null) return;
   const c = coefsDeLAnnexe(lireAnnexe(selecteurAnnexe.value));
-  const v = champsDepuisModele({ ...modeleParDefaut(), gamma_c: c.gamma_c, alpha_cc: c.alpha_cc });
-  for (const cle of ['gamma_c', 'alpha_cc'] as const) {
+  const v = champsDepuisModele({ ...modeleParDefaut(), ...c });
+  for (const cle of ['gamma_c', 'alpha_cc', 'k_vRd_max'] as const) {
     const champ = formulaire.querySelector<HTMLInputElement>(`[data-champ="${cle}"]`);
     if (champ !== null) champ.value = v[cle] ?? '';
   }

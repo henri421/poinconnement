@@ -60,7 +60,7 @@ connues en découlent et servent de tests :
 v_Ed     = β · V_Ed / (u · d)                        §6.4.3
 v_Rd,c   = C_Rd,c · k · (100 · ρ_l · f_ck)^(1/3) + k₁ · σ_cp
          ≥ v_min + k₁ · σ_cp                         §6.4.4(1), éq. (6.47)
-v_Rd,max = 0,5 · ν · f_cd,  ν = 0,6·(1 − f_ck/250)   §6.4.5(3)
+v_Rd,max = k · ν · f_cd,  ν = 0,6·(1 − f_ck/250)   §6.4.5(3), k = 0,4 recommandé (AC:2010), modifiable
 v_Rd,cs  = 0,75 · v_Rd,c + 1,5 · (d/s_r) · A_sw · f_ywd,ef · sin α / (u₁·d)
                                                      éq. (6.52)
 u_out,ef = β · V_Ed / (v_Rd,c · d)                   éq. (6.54)

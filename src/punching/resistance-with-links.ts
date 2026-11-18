@@ -30,9 +30,14 @@ export interface DonneesArmatures {
   u1: number;
 }
 
+/** Valeur recommandee de k dans `v_Rd,max = k * nu * f_cd`, note du §6.4.5(3) (AC:2010). */
+export const K_VRD_MAX_RECOMMANDE = 0.4;
+
 /**
- * Contrainte maximale admissible au nu du poteau `v_Rd,max = 0,5 * nu * f_cd`
- * (MPa), §6.4.5(3), avec `nu = 0,6 * (1 - f_ck/250)`.
+ * Contrainte maximale admissible au nu du poteau `v_Rd,max = k * nu * f_cd`
+ * (MPa), §6.4.5(3), avec `nu = 0,6 * (1 - f_ck/250)`. Depuis le corrigendum
+ * AC:2010, v_Rd,max est un parametre national ; la valeur recommandee est
+ * 0,4 nu f_cd (le texte de 2004 avant corrigendum donnait 0,5 nu f_cd).
  *
  * Elle se confronte a `v_Ed` calculee sur `u0`, et NON sur `u1` : c est
  * l ecrasement des bielles au contact du poteau qui est en jeu. Le depassement
@@ -43,6 +48,7 @@ export function resistanceMaximale(
   f_ck: number,
   gamma_c: number = GAMMA_C_PAR_DEFAUT,
   alpha_cc: number = ALPHA_CC_PAR_DEFAUT,
+  k: number = K_VRD_MAX_RECOMMANDE,
 ): number {
   if (!Number.isFinite(f_ck) || f_ck <= 0) {
     throw new Error('f_ck doit être un nombre strictement positif (MPa).');
@@ -54,9 +60,13 @@ export function resistanceMaximale(
     throw new Error('alpha_cc doit être un nombre strictement positif (-).');
   }
 
+  if (!Number.isFinite(k) || k <= 0) {
+    throw new Error('Le coefficient k de v_Rd,max doit être un nombre strictement positif (-).');
+  }
+
   const nu = 0.6 * (1 - f_ck / 250);
   const f_cd = (alpha_cc * f_ck) / gamma_c;
-  return 0.5 * nu * f_cd;
+  return k * nu * f_cd;
 }
 
 /**

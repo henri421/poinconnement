@@ -13,7 +13,9 @@ describe('annexe luxembourgeoise', () => {
     expect(v.alpha_cc.valeur).toBe(0.85);
     expect(v.alpha_cc.source).toMatch(/^ILNAS-EN 1992-1-1\/AN-LU:2020, 3\.1\.6\(1\)P : valeur présumée/);
     expect(v.gamma_c).toEqual({ valeur: 1.5, source: expect.stringMatching(/AN-LU:2020, tableau 2\.1N : valeur recommandée présumée retenue/) });
-    expect(coefsDeLAnnexe('recommande')).toEqual({ gamma_c: 1.5, alpha_cc: 1 });
+    expect(coefsDeLAnnexe('recommande')).toEqual({ gamma_c: 1.5, alpha_cc: 1, k_vRd_max: 0.4 });
+    expect(v.k_vRd_max.valeur).toBe(0.4);
+    expect(v.k_vRd_max.source).toMatch(/^ILNAS-EN 1992-1-1\/AN-LU:2020, 6\.4\.5\(3\) : valeur recommandée présumée retenue/);
   });
 
   it('valeur changee : source imposee', () => {

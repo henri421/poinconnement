@@ -66,6 +66,8 @@ export interface ModeleSaisie {
   gamma_c: number;
   /** Coefficient des effets a long terme (-). */
   alpha_cc: number;
+  /** k de v_Rd,max = k nu f_cd, §6.4.5(3) (-). */
+  k_vRd_max: number;
   /** Annexe nationale (lot E) : preremplit gamma_c et alpha_cc, qui restent modifiables. */
   annexe: AnnexeNationale;
 }
@@ -107,6 +109,7 @@ export function modeleParDefaut(): ModeleSaisie {
     alpha: 90,
     gamma_c: 1.5,
     alpha_cc: 1,
+    k_vRd_max: 0.4,
     annexe: 'recommande',
   };
 }
@@ -155,6 +158,7 @@ export function champsDepuisModele(modele: ModeleSaisie): Record<string, string>
     alpha: String(modele.alpha),
     gamma_c: String(modele.gamma_c),
     alpha_cc: String(modele.alpha_cc),
+    k_vRd_max: String(modele.k_vRd_max),
     annexe: modele.annexe,
   };
 }
@@ -203,6 +207,7 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
     'V_Ed',
     'gamma_c',
     'alpha_cc',
+    'k_vRd_max',
     ...(forme === 'rectangulaire' ? ['c1', 'c2'] : ['D']),
     ...(betaImpose ? ['beta'] : []),
     ...(armatures ? ['s_r', 'f_ywd', 'alpha'] : []),
@@ -260,6 +265,7 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
       alpha: requis.alpha ?? facultatif('alpha', precedent.alpha),
       gamma_c: requis.gamma_c,
       alpha_cc: requis.alpha_cc,
+      k_vRd_max: requis.k_vRd_max,
       annexe: lireAnnexe(valeurs.annexe),
     },
   };
@@ -295,6 +301,7 @@ export function donneesDepuisModele(modele: ModeleSaisie): DonneesPoinconnement 
     },
     gamma_c: modele.gamma_c,
     alpha_cc: modele.alpha_cc,
+    k_vRd_max: modele.k_vRd_max,
     armatures: modele.armatures
       ? { s_r: modele.s_r, f_ywd: modele.f_ywd, alpha: radians(modele.alpha) }
       : undefined,

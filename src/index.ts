@@ -26,6 +26,7 @@ export {
 } from './punching/resistance-without-links';
 
 export {
+  K_VRD_MAX_RECOMMANDE,
   limiteElastiqueEfficace,
   perimetreExterieur,
   resistanceAvecArmatures,
