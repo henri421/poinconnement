@@ -11,7 +11,7 @@
 import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, type BarreFeuilles, type Json } from 'aedificium-ui';
 import { coefsDeLAnnexe } from './annexe';
 import { nombreAffiche, notationHtml } from 'aedificium-ui';
-import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml } from 'aedificium-ui';
+import { blocsEnTexte, definirLangue, langueDuDocument, notationTexte, noteDeCalculHtml, telechargerNotePdf } from 'aedificium-ui';
 import { hauteurUtileMoyenne, verifierPoinconnement } from '../../src/index';
 import { schemaDesPositions } from './beta-diagram';
 import {
@@ -253,24 +253,24 @@ function exporterResultats(sortie: EtatExportable): void {
   );
 }
 
-function exporterNote(sortie: EtatExportable): void {
+function exporterNote(sortie: EtatExportable, pdf = false): void {
   // Valeurs courantes des champs, pas celles du stockage : ce que l'on voit
   // est ce que la note portera.
-  const html = noteDeCalculHtml(
-    noteDuCalcul(sortie, {
-      projet: champProjet.value,
-      element: champElement.value,
-      date: dateDuJour(),
-    }),
-    // STYLES_TRACE et non JETONS : la note porte les DEUX dessins en ligne,
-    // et les jetons seuls les laisseraient noirs, exactement comme les SVG
-    // exportes separement.
-    STYLES_TRACE
-  );
+  const noteCalc = noteDuCalcul(sortie, {
+    projet: champProjet.value,
+    element: champElement.value,
+    date: dateDuJour(),
+  });
+  // STYLES_TRACE et non JETONS : la note porte les DEUX dessins en ligne,
+  // et les jetons seuls les laisseraient noirs, exactement comme les SVG
+  // exportes separement.
+  const html = (): string => noteDeCalculHtml(noteCalc, STYLES_TRACE);
   const nom = `${baseDeNom(sortie)}-note.html`;
 
+  // PDF construit au clic ; en cas d'echec, la note HTML prend le relais.
+  if (pdf) void telechargerNotePdf(`${baseDeNom(sortie)}-note.pdf`, noteCalc, STYLES_TRACE).catch(() => ouvrirOuTelecharger(nom, html()));
   // Onglet si possible, sinon telechargement : jamais un bouton muet.
-  ouvrirOuTelecharger(nom, html);
+  else ouvrirOuTelecharger(nom, html());
 }
 
 document.addEventListener('click', (evenement) => {
@@ -286,7 +286,7 @@ document.addEventListener('click', (evenement) => {
   if (action === 'exporter-positions') exporterDessin(derniereSortie, 'positions');
   else if (action === 'exporter-perimetres') exporterDessin(derniereSortie, 'perimetres');
   else if (action === 'exporter-resultats') exporterResultats(derniereSortie);
-  else if (action === 'exporter-note') exporterNote(derniereSortie);
+  else if (action === 'exporter-note' || action === 'exporter-note-pdf') exporterNote(derniereSortie, action === 'exporter-note-pdf');
 });
 
 const selecteurAnnexe = formulaire.querySelector<HTMLSelectElement>('[data-role="annexe"]');
